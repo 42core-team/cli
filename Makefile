@@ -1,5 +1,17 @@
+VPATH	:=	cmd \
+			cmd/core-cli \
+			internal/bubble \
+			internal/game \
+			internal/github \
+			internal/tournament \
+			internal/utils \
+			pkg \
+			pkg/lib
+
+SRCS := $(foreach dir, $(VPATH), $(wildcard $(dir)/*.go))
+
 all:
-	go run cmd/core-cli/main.go
+	go run $(SRCS)
 
 build:
-	go build -o core-cli cmd/core-cli/main.go
+	go build -o core-cli $(SRCS)
