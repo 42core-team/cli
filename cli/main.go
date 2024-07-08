@@ -8,9 +8,9 @@ import (
 )
 
 func main() {
-	p := tea.NewProgram(initialModel())
-	if err := p.Start(); err != nil {
-		fmt.Println("Error running program:", err)
+	_, err := tea.NewProgram(NewModel()).Run()
+	if err != nil {
+		fmt.Println("Oh no:", err)
 		os.Exit(1)
 	}
 }
