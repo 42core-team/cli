@@ -1,12 +1,5 @@
-VPATH	:=	cmd \
-			cmd/core-cli \
-			internal/bubble \
-			internal/game \
-			internal/github \
-			internal/tournament \
-			internal/utils \
-			pkg \
-			pkg/lib
+VPATH	:=	cli \
+			services
 
 SRCS := $(foreach dir, $(VPATH), $(wildcard $(dir)/*.go))
 
