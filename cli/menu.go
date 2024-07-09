@@ -56,6 +56,20 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.form = f
 		cmds = append(cmds, cmd)
 	}
+
+	if m.form.State == huh.StateCompleted {
+		switch m.form.Get("option") {
+		case "Manage Teams":
+			return NewPage2Model(), nil
+		case "Tournament":
+			return NewModel(), nil
+		case "Leaderboard":
+			return NewModel(), nil
+		default:
+			fmt.Println("Go fuck yourself")
+		}
+	}
+
 	return m, tea.Batch(cmds...)
 }
 
@@ -66,18 +80,5 @@ func (m Model) View() string {
 	form := m.lg.NewStyle().Margin(1, 0).Render(v)
 
 	body := lipgloss.JoinHorizontal(lipgloss.Top, form)
-
-	if m.form.State == huh.StateCompleted {
-		switch m.form.Get("option") {
-		case "Manage Teams":
-			return s.Base.Render("Manage Teams")
-		case "Tournament":
-			return s.Base.Render("Tournament")
-		case "Leaderboard":
-			return s.Base.Render("Leaderboard")
-		default:
-			fmt.Println("Go fuck yourself")
-		}
-	}
 	return s.Base.Render(body)
 }
