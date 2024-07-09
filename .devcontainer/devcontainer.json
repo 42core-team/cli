@@ -1,0 +1,24 @@
+{
+	"name": "Go",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspace",
+	"customizations": {
+		"settings": {
+			"go.gopath": "/go",
+			"go.toolsGopath": "/go",
+			"go.useLanguageServer": true
+		},
+		"vscode": {
+			"extensions": [
+				"golang.go",
+				"bierner.markdown-mermaid",
+				"ms-azuretools.vscode-docker"
+			]
+		}
+	},
+	"mounts": [
+		"source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind,consistency=cached"
+	]
+}
