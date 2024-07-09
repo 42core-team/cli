@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type Model struct {
+type MainMenuModel struct {
 	lg     *lipgloss.Renderer
 	styles *Styles
 	form   *huh.Form
@@ -17,8 +17,8 @@ type Model struct {
 	chosen string
 }
 
-func NewModel() Model {
-	m := Model{width: maxWidth}
+func NewMainMenuModel() MainMenuModel {
+	m := MainMenuModel{width: maxWidth}
 	m.lg = lipgloss.DefaultRenderer()
 	m.styles = NewStyles(m.lg)
 
@@ -35,11 +35,11 @@ func NewModel() Model {
 	return m
 }
 
-func (m Model) Init() tea.Cmd {
+func (m MainMenuModel) Init() tea.Cmd {
 	return m.form.Init()
 }
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m MainMenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width = min(msg.Width, maxWidth) - m.styles.Base.GetHorizontalFrameSize()
@@ -61,11 +61,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.form.State == huh.StateCompleted {
 		switch m.form.Get("option") {
 		case "Manage Teams":
-			return NewPage2Model(), nil
+			return NewManageTeamMenuModel(), nil
 		case "Tournament":
-			return NewModel(), nil
+			return NewMainMenuModel(), nil
 		case "Leaderboard":
-			return NewModel(), nil
+			return NewMainMenuModel(), nil
 		default:
 			fmt.Println("Go fuck yourself")
 		}
@@ -74,7 +74,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m Model) View() string {
+func (m MainMenuModel) View() string {
 	s := m.styles
 
 	v := strings.TrimSuffix(m.form.View(), "\n\n")
