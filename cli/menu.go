@@ -68,7 +68,6 @@ func (m Model) View() string {
 	body := lipgloss.JoinHorizontal(lipgloss.Top, form)
 
 	if m.form.State == huh.StateCompleted {
-		fmt.Println(m.form.Get("option"))
 		switch m.form.Get("option") {
 		case "Manage Teams":
 			return s.Base.Render("Manage Teams")
