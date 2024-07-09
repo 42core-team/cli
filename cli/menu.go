@@ -31,6 +31,7 @@ func NewModel() Model {
 				Description("Choose what you want to do").Value(&m.chosen),
 		),
 	)
+	m.Init()
 	return m
 }
 

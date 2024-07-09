@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -23,12 +24,13 @@ func NewPage2Model() Page2Model {
 	m.form = huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[string]().
-				Key("class").
+				Key("option").
 				Options(huh.NewOptions("List Teams", "New Team")...).
-				Title("Main menu").
+				Title("Manage team menu").
 				Description("Choose what you want to do"),
 		),
 	)
+	m.Init()
 	return m
 }
 
@@ -56,7 +58,14 @@ func (m Page2Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	if m.form.State == huh.StateCompleted {
-		return NewModel(), nil
+		switch m.form.Get("option") {
+		case "List Teams":
+			return NewModel(), nil
+		case "New Team":
+			return NewModel(), nil
+		default:
+			fmt.Println("Go fuck yourself")
+		}
 	}
 
 	return m, tea.Batch(cmds...)
