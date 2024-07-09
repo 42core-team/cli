@@ -56,7 +56,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.form = f
 		cmds = append(cmds, cmd)
 	}
-
 	return m, tea.Batch(cmds...)
 }
 
@@ -81,7 +80,5 @@ func (m Model) View() string {
 			fmt.Println("Go fuck yourself")
 		}
 	}
-
 	return s.Base.Render(body)
-
 }
