@@ -10,12 +10,14 @@ type State int
 const (
 	TListState State = iota
 	TDetailsState
+	PListState
 )
 
 type Model struct {
 	state        State
 	tListForm    *huh.Form
 	tDetailsForm *huh.Form
+	pListForm    *huh.Form
 }
 
 func NewModel() Model {
@@ -54,4 +56,17 @@ func initTDetailsForm(m *Model) tea.Cmd {
 		),
 	)
 	return m.tDetailsForm.Init()
+}
+
+func initPListForm(m *Model) tea.Cmd {
+	m.pListForm = huh.NewForm(
+		huh.NewGroup(
+			huh.NewSelect[string]().
+				Key("playerName").
+				Options(huh.NewOptions("New", "Player 1", "Player 2")...).
+				Title("Player List").
+				Description("Choose a player to view details"),
+		),
+	)
+	return m.pListForm.Init()
 }
