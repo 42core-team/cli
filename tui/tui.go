@@ -11,6 +11,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
+		case "esc":
+			switch m.state {
+			case TDetailsState:
+				return switchState(&m, TListState)
+			}
 		}
 	}
 
@@ -23,8 +28,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmds = append(cmds, cmd)
 		}
 		if m.tListForm.State == huh.StateCompleted {
-			m.state = TDetailsState
-			cmds = append(cmds, initTDetailsForm(&m))
+			return switchState(&m, TDetailsState)
 		}
 	case TDetailsState:
 		form, cmd := m.tDetailsForm.Update(msg)
@@ -33,8 +37,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmds = append(cmds, cmd)
 		}
 		if m.tDetailsForm.State == huh.StateCompleted {
-			m.state = TListState
-			cmds = append(cmds, initTListForm(&m))
+			return switchState(&m, TListState)
 		}
 	}
 
