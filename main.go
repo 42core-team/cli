@@ -3,17 +3,21 @@ package main
 import (
 	"core-cli/github"
 	"core-cli/tui"
-	"fmt"
-	"os"
+	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	github.NewClient()
-	_, err := tea.NewProgram(tui.NewModel()).Run()
+	godotenv.Load()
+
+	err := github.NewClient()
 	if err != nil {
-		fmt.Println("Oh no:", err)
-		os.Exit(1)
+		log.Fatalln("Error creating GitHub client:", err)
+	}
+	_, err = tea.NewProgram(tui.NewModel()).Run()
+	if err != nil {
+		log.Fatalln("Error running program:", err)
 	}
 }
