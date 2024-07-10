@@ -1,6 +1,7 @@
 package main
 
 import (
+	"core-cli/github"
 	"core-cli/tui"
 	"fmt"
 	"os"
@@ -9,6 +10,7 @@ import (
 )
 
 func main() {
+	github.NewClient()
 	_, err := tea.NewProgram(tui.NewModel()).Run()
 	if err != nil {
 		fmt.Println("Oh no:", err)

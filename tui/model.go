@@ -49,7 +49,7 @@ func initTDetailsForm(m *Model) tea.Cmd {
 				Key("tournamentDetails").
 				Title("Tournament Details").
 				Description("Choose an option").
-				Options(huh.NewOptions("Option 1", "Option 2", "Option 3")...),
+				Options(huh.NewOptions("List Participants", "Run games", "Edit Settings")...),
 		),
 	)
 	return m.tDetailsForm.Init()
