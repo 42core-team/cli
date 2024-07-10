@@ -1,7 +1,7 @@
 package main
 
 import (
-	"core-cli/models"
+	"core-cli/tui"
 	"fmt"
 	"os"
 
@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	_, err := tea.NewProgram(models.NewMainModel()).Run()
+	_, err := tea.NewProgram(tui.NewModel()).Run()
 	if err != nil {
 		fmt.Println("Oh no:", err)
 		os.Exit(1)
