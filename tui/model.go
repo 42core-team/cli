@@ -8,21 +8,30 @@ import (
 type State int
 
 const (
-	TournamentList State = iota
-	TournamentDetails
+	TListState State = iota
+	TDetailsState
 )
 
 type Model struct {
-	state                 State
-	tournamentListForm    *huh.Form
-	tournamentDetailsForm *huh.Form
+	state        State
+	tListForm    *huh.Form
+	tDetailsForm *huh.Form
 }
 
 func NewModel() Model {
 	m := Model{
-		state: TournamentList,
+		state: TListState,
 	}
-	m.tournamentListForm = huh.NewForm(
+	initTListForm(&m)
+	return m
+}
+
+func (m Model) Init() tea.Cmd {
+	return initTListForm(&m)
+}
+
+func initTListForm(m *Model) tea.Cmd {
+	m.tListForm = huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[string]().
 				Key("tournamentName").
@@ -30,7 +39,11 @@ func NewModel() Model {
 				Title("Choose your tournament"),
 		),
 	)
-	m.tournamentDetailsForm = huh.NewForm(
+	return m.tListForm.Init()
+}
+
+func initTDetailsForm(m *Model) tea.Cmd {
+	m.tDetailsForm = huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[string]().
 				Key("tournamentDetails").
@@ -39,9 +52,5 @@ func NewModel() Model {
 				Options(huh.NewOptions("Option 1", "Option 2", "Option 3")...),
 		),
 	)
-	return m
-}
-
-func (m Model) Init() tea.Cmd {
-	return tea.Batch(m.tournamentListForm.Init(), m.tournamentDetailsForm.Init())
+	return m.tDetailsForm.Init()
 }
