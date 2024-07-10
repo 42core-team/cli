@@ -53,7 +53,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmds = append(cmds, cmd)
 		}
 		if m.pListForm.State == huh.StateCompleted {
+			switch m.pListForm.GetString("playerList") {
+			case "New":
+				return switchState(&m, PAddState)
+			}
 			return switchState(&m, TDetailsState)
+		}
+	case PAddState:
+		form, cmd := m.pAddForm.Update(msg)
+		if f, ok := form.(*huh.Form); ok {
+			m.pAddForm = f
+			cmds = append(cmds, cmd)
 		}
 	}
 
@@ -68,6 +78,8 @@ func (m Model) View() string {
 		return m.tDetailsForm.View()
 	case PListState:
 		return m.pListForm.View()
+	case PAddState:
+		return m.pAddForm.View()
 	}
 	return "Empty view"
 }
