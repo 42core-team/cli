@@ -36,7 +36,8 @@ func initTListForm(m *Model) tea.Cmd {
 			huh.NewSelect[string]().
 				Key("tournamentName").
 				Options(huh.NewOptions("New", "Tournament 1", "Tournament 2")...).
-				Title("Choose your tournament"),
+				Title("Tournament List").
+				Description("Choose a tournament to view details"),
 		),
 	)
 	return m.tListForm.Init()
