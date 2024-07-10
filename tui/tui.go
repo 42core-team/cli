@@ -16,23 +16,25 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	var cmds []tea.Cmd
 	switch m.state {
-	case TournamentList:
-		form, cmd := m.tournamentListForm.Update(msg)
+	case TListState:
+		form, cmd := m.tListForm.Update(msg)
 		if f, ok := form.(*huh.Form); ok {
-			m.tournamentListForm = f
+			m.tListForm = f
 			cmds = append(cmds, cmd)
 		}
-		if m.tournamentListForm.State == huh.StateCompleted {
-			m.state = TournamentDetails
+		if m.tListForm.State == huh.StateCompleted {
+			m.state = TDetailsState
+			cmds = append(cmds, initTDetailsForm(&m))
 		}
-	case TournamentDetails:
-		form, cmd := m.tournamentDetailsForm.Update(msg)
+	case TDetailsState:
+		form, cmd := m.tDetailsForm.Update(msg)
 		if f, ok := form.(*huh.Form); ok {
-			m.tournamentDetailsForm = f
+			m.tDetailsForm = f
 			cmds = append(cmds, cmd)
 		}
-		if m.tournamentDetailsForm.State == huh.StateCompleted {
-			m.state = TournamentList
+		if m.tDetailsForm.State == huh.StateCompleted {
+			m.state = TListState
+			cmds = append(cmds, initTListForm(&m))
 		}
 	}
 
@@ -41,10 +43,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() string {
 	switch m.state {
-	case TournamentList:
-		return m.tournamentListForm.View()
-	case TournamentDetails:
-		return m.tournamentDetailsForm.View()
+	case TListState:
+		return m.tListForm.View()
+	case TDetailsState:
+		return m.tDetailsForm.View()
 	}
 	return "Empty view"
 }
