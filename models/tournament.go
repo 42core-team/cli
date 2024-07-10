@@ -1,6 +1,7 @@
 package models
 
 import (
+	"core-cli/data"
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -8,11 +9,11 @@ import (
 )
 
 type TournamentModel struct {
-	main *MainModel
+	data *data.Data
 	form *huh.Form
 }
 
-func NewTournamentModel(main *MainModel) TournamentModel {
+func NewTournamentModel(data.Data *data.Data) TournamentModel {
 	m := TournamentModel{
 		main: main,
 	}
