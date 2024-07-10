@@ -2,10 +2,8 @@ package main
 
 import (
 	"core-cli/github"
-	"core-cli/tui"
 	"log"
 
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/joho/godotenv"
 )
 
@@ -16,8 +14,9 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error creating GitHub client:", err)
 	}
-	_, err = tea.NewProgram(tui.NewModel()).Run()
-	if err != nil {
-		log.Fatalln("Error running program:", err)
-	}
+	github.CheckGithubUsername("paulicen")
+	// _, err = tea.NewProgram(tui.NewModel()).Run()
+	// if err != nil {
+	// 	log.Fatalln("Error running program:", err)
+	// }
 }

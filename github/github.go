@@ -8,6 +8,7 @@ import (
 )
 
 var client *github.Client
+var orgName = os.Getenv("GITHUB_ORG")
 
 func NewClient() error {
 	client = github.NewClient(nil).WithAuthToken(os.Getenv("GITHUB_TOKEN"))
