@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"core-cli/db"
 	"core-cli/github"
 	"errors"
 
@@ -35,19 +36,6 @@ func NewModel() Model {
 
 func (m Model) Init() tea.Cmd {
 	return initTListForm(&m)
-}
-
-func initTListForm(m *Model) tea.Cmd {
-	m.tListForm = huh.NewForm(
-		huh.NewGroup(
-			huh.NewSelect[string]().
-				Key("tournamentName").
-				Options(huh.NewOptions("New", "Tournament 1", "Tournament 2")...).
-				Title("Tournament List").
-				Description("Choose a tournament to view details"),
-		),
-	)
-	return m.tListForm.Init()
 }
 
 func initTDetailsForm(m *Model) tea.Cmd {
@@ -98,4 +86,23 @@ func initPAddForm(m *Model) tea.Cmd {
 		),
 	)
 	return m.pAddForm.Init()
+}
+
+func initTListForm(m *Model) tea.Cmd {
+	var nameList []string = []string{"<New>"}
+
+	for _, team := range db.GetTeams() {
+		nameList = append(nameList, team.Name)
+	}
+
+	m.tListForm = huh.NewForm(
+		huh.NewGroup(
+			huh.NewSelect[string]().
+				Key("teamName").
+				Options(huh.NewOptions(nameList...)...).
+				Title("Team List").
+				Description("Choose a team to view details or create a new one"),
+		),
+	)
+	return m.tListForm.Init()
 }
