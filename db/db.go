@@ -2,6 +2,7 @@ package db
 
 import (
 	"core-cli/github"
+	"core-cli/model"
 	"os"
 	"strings"
 
@@ -13,11 +14,15 @@ var db *gorm.DB
 
 func Connect() {
 	pullDatabase()
+
 	var err error
 	db, err = gorm.Open(sqlite.Open("./cli-db/coreEvent.db"), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
+
+	db.AutoMigrate(model.Player{}, model.Team{})
+
 	pushDatabase()
 }
 
