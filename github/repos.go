@@ -4,6 +4,11 @@ import (
 	"github.com/google/go-github/v62/github"
 )
 
+func GetRepo(name string) (*github.Repository, error) {
+	repo, _, err := client.Repositories.Get(getGithubContext(), orgName, name)
+	return repo, err
+}
+
 func CreateRepo(name string) (*github.Repository, error) {
 	r := &github.Repository{
 		Name:    github.String(name),
