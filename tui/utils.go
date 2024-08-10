@@ -9,8 +9,6 @@ func switchState(m *Model, state State) (tea.Model, tea.Cmd) {
 		return *m, initTListForm(m)
 	case TDetailsState:
 		return *m, initTDetailsForm(m)
-	case PListState:
-		return *m, initPListForm(m)
 	case PAddState:
 		return *m, initPAddForm(m)
 	default:
