@@ -13,7 +13,9 @@ import (
 var db *gorm.DB
 
 func Connect() {
-	pullDatabase()
+	if os.Getenv("GITHUB_USE_DB_REPO") == "true" {
+		pullDatabase()
+	}
 
 	var err error
 	db, err = gorm.Open(sqlite.Open("./cli-db/coreEvent.db"), &gorm.Config{})
@@ -23,7 +25,9 @@ func Connect() {
 
 	db.AutoMigrate(model.Player{}, model.Team{})
 
-	pushDatabase()
+	if os.Getenv("GITHUB_USE_DB_REPO") == "true" {
+		pushDatabase()
+	}
 }
 
 func pullDatabase() {
