@@ -8,17 +8,19 @@ import (
 )
 
 func initTListForm(m *Model) tea.Cmd {
-	var nameList []string = []string{"<New>"}
-
-	for _, team := range db.GetTeams() {
-		nameList = append(nameList, team.Name)
-	}
-
 	m.tListForm = huh.NewForm(
 		huh.NewGroup(
-			huh.NewSelect[string]().
+			huh.NewSelect[uint]().
 				Key("teamName").
-				Options(huh.NewOptions(nameList...)...).
+				OptionsFunc(func() []huh.Option[uint] {
+					var options []huh.Option[uint]
+					options = append(options, huh.NewOption[uint]("<New>", 0))
+
+					for _, team := range db.GetTeams() {
+						options = append(options, huh.NewOption(team.Name, team.ID))
+					}
+					return options
+				}, "static").
 				Title("Team List").
 				Description("Choose a team to view details or create a new one"),
 		),
@@ -36,7 +38,7 @@ func updateTListForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	if m.tListForm.State == huh.StateCompleted {
-		m.mcontext.CurrentTeamName = m.tListForm.GetString("teamName")
+		m.mcontext.CurrentTeamID = m.tListForm.Get("teamName").(uint)
 		return switchState(m, TDetailsState)
 	}
 
@@ -44,21 +46,21 @@ func updateTListForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func initTDetailsForm(m *Model) tea.Cmd {
-	var nameList []string = []string{"<New>"}
-
-	for _, player := range db.GetPLayersByTeamName(m.mcontext.CurrentTeamName) {
-		nameList = append(nameList, player.IntraName)
-	}
-
-	m.mcontext.CurrentTeamID = db.GetTeamByName(m.mcontext.CurrentTeamName).ID
-
 	m.tDetailsForm = huh.NewForm(
 		huh.NewGroup(
-			huh.NewSelect[string]().
+			huh.NewSelect[uint]().
 				Key("teamDetails").
 				Title("Team Details").
 				Description("Choose an option").
-				Options(huh.NewOptions(nameList...)...),
+				OptionsFunc(func() []huh.Option[uint] {
+					var options []huh.Option[uint]
+					options = append(options, huh.NewOption[uint]("<New>", 0))
+
+					for _, player := range db.GetPlayersByTeamID(m.mcontext.CurrentTeamID) {
+						options = append(options, huh.NewOption(player.IntraName, player.ID))
+					}
+					return options
+				}, "static"),
 		),
 	)
 	return m.tDetailsForm.Init()
@@ -74,14 +76,13 @@ func updateTDetailsForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	if m.tDetailsForm.State == huh.StateCompleted {
-		switch m.tDetailsForm.GetString("teamDetails") {
-		case "<New>":
+		playerID := m.tDetailsForm.Get("teamDetails").(uint)
+		if playerID == 0 {
 			return switchState(m, PAddState)
-		default:
-			m.mcontext.CurrentGithubName = m.tDetailsForm.GetString("teamDetails")
-			m.mcontext.CurrentPlayerID = db.GetPlayerByIntraName(m.mcontext.CurrentGithubName).ID
-			return switchState(m, PDetailsState)
 		}
+
+		m.mcontext.CurrentPlayerID = playerID
+		return switchState(m, PDetailsState)
 	}
 
 	return m, tea.Batch(cmds...)

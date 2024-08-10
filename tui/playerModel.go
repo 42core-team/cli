@@ -74,27 +74,35 @@ func initPDetailsForm(m *Model) tea.Cmd {
 
 	m.pDetailsForm = huh.NewForm(
 		huh.NewGroup(
-			huh.NewInput().Key("githubName").Title("Github Name").Value(&player.GithubName).Validate(func(input string) error {
-				if input == "" {
-					return errors.New("player name cannot be empty")
-				}
-				if input != m.mcontext.CurrentGithubName && db.PlayerExistsByGithubName(input) {
-					return errors.New(input + " already exists in the db")
-				}
-				if input != m.mcontext.CurrentGithubName && !github.GithubUserExists(input) {
-					return errors.New(input + " does not exist on github")
-				}
-				return nil
-			}),
-			huh.NewInput().Key("intraName").Title("Intra Name").Value(&player.IntraName).Validate(func(input string) error {
-				if input == "" {
-					return errors.New("player name cannot be empty")
-				}
-				if input != m.mcontext.CurrentIntraName && db.PlayerExistsByIntraName(input) {
-					return errors.New(input + " already exists in the db")
-				}
-				return nil
-			}),
+			huh.NewInput().
+				Key("githubName").
+				Title("Github Name").
+				Value(&player.GithubName).
+				Validate(func(input string) error {
+					if input == "" {
+						return errors.New("player name cannot be empty")
+					}
+					if input != m.mcontext.CurrentGithubName && db.PlayerExistsByGithubName(input) {
+						return errors.New(input + " already exists in the db")
+					}
+					if input != m.mcontext.CurrentGithubName && !github.GithubUserExists(input) {
+						return errors.New(input + " does not exist on github")
+					}
+					return nil
+				}),
+			huh.NewInput().
+				Key("intraName").
+				Title("Intra Name").
+				Value(&player.IntraName).
+				Validate(func(input string) error {
+					if input == "" {
+						return errors.New("player name cannot be empty")
+					}
+					if input != m.mcontext.CurrentIntraName && db.PlayerExistsByIntraName(input) {
+						return errors.New(input + " already exists in the db")
+					}
+					return nil
+				}),
 			huh.NewConfirm().Key("save").Title("Save Changes").Description("Do you want to save the changes?"),
 		),
 	)
