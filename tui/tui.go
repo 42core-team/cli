@@ -2,7 +2,6 @@ package tui
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/huh"
 )
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -21,53 +20,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	var cmds []tea.Cmd
 	switch m.state {
 	case TListState:
-		form, cmd := m.tListForm.Update(msg)
-		if f, ok := form.(*huh.Form); ok {
-			m.tListForm = f
-			cmds = append(cmds, cmd)
-		}
-		if m.tListForm.State == huh.StateCompleted {
-			return switchState(&m, TDetailsState)
-		}
+		return updateTListForm(&m, &msg)
 	case TDetailsState:
-		form, cmd := m.tDetailsForm.Update(msg)
-		if f, ok := form.(*huh.Form); ok {
-			m.tDetailsForm = f
-			cmds = append(cmds, cmd)
-		}
-		if m.tDetailsForm.State == huh.StateCompleted {
-			switch m.tDetailsForm.GetString("tournamentDetails") {
-			case "List Participants":
-				return switchState(&m, PListState)
-			default:
-				return switchState(&m, TListState)
-			}
-		}
-	case PListState:
-		form, cmd := m.pListForm.Update(msg)
-		if f, ok := form.(*huh.Form); ok {
-			m.pListForm = f
-			cmds = append(cmds, cmd)
-		}
-		if m.pListForm.State == huh.StateCompleted {
-			switch m.pListForm.GetString("playerList") {
-			case "New":
-				return switchState(&m, PAddState)
-			}
-			return switchState(&m, TDetailsState)
-		}
+		return updateTDetailsForm(&m, &msg)
 	case PAddState:
-		form, cmd := m.pAddForm.Update(msg)
-		if f, ok := form.(*huh.Form); ok {
-			m.pAddForm = f
-			cmds = append(cmds, cmd)
-		}
+		return updatePAddForm(&m, &msg)
 	}
 
-	return m, tea.Batch(cmds...)
+	return m, nil
 }
 
 func (m Model) View() string {

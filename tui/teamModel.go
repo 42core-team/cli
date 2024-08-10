@@ -3,6 +3,7 @@ package tui
 import (
 	"core-cli/db"
 	"core-cli/github"
+	"core-cli/model"
 	"errors"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -28,6 +29,22 @@ func initTListForm(m *Model) tea.Cmd {
 	return m.tListForm.Init()
 }
 
+func updateTListForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
+	var cmds []tea.Cmd
+
+	form, cmd := m.tListForm.Update(*msg)
+	if f, ok := form.(*huh.Form); ok {
+		m.tListForm = f
+		cmds = append(cmds, cmd)
+	}
+
+	if m.tListForm.State == huh.StateCompleted {
+		return switchState(m, TDetailsState)
+	}
+
+	return m, tea.Batch(cmds...)
+}
+
 func initTDetailsForm(m *Model) tea.Cmd {
 	var nameList []string = []string{"<New>"}
 
@@ -45,6 +62,26 @@ func initTDetailsForm(m *Model) tea.Cmd {
 		),
 	)
 	return m.tDetailsForm.Init()
+}
+
+func updateTDetailsForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
+	var cmds []tea.Cmd
+
+	form, cmd := m.tDetailsForm.Update(msg)
+	if f, ok := form.(*huh.Form); ok {
+		m.tDetailsForm = f
+		cmds = append(cmds, cmd)
+	}
+	if m.tDetailsForm.State == huh.StateCompleted {
+		switch m.tDetailsForm.GetString("teamDetails") {
+		case "<New>":
+			return switchState(m, PAddState)
+		default:
+			return switchState(m, TListState)
+		}
+	}
+
+	return m, tea.Batch(cmds...)
 }
 
 func initPAddForm(m *Model) tea.Cmd {
@@ -69,4 +106,24 @@ func initPAddForm(m *Model) tea.Cmd {
 		),
 	)
 	return m.pAddForm.Init()
+}
+
+func updatePAddForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
+	var cmds []tea.Cmd
+
+	form, cmd := m.pAddForm.Update(msg)
+	if f, ok := form.(*huh.Form); ok {
+		m.pAddForm = f
+		cmds = append(cmds, cmd)
+	}
+
+	if m.pAddForm.State == huh.StateCompleted {
+		db.SavePlayer(&model.Player{
+			GithubName: m.pAddForm.GetString("githubName"),
+			IntraName:  m.pAddForm.GetString("intraName"),
+		})
+		return switchState(m, TListState)
+	}
+
+	return m, tea.Batch(cmds...)
 }
