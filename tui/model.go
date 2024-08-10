@@ -16,15 +16,29 @@ const (
 
 type Model struct {
 	state        State
+	mcontext     ModelContext
 	tListForm    *huh.Form
 	tDetailsForm *huh.Form
 	pListForm    *huh.Form
 	pAddForm     *huh.Form
 }
 
+type ModelContext struct {
+	CurrentTeamName   string
+	CurrentTeamID     int
+	CurrentPlayerName string
+	CurrentPlayerID   int
+}
+
 func NewModel() Model {
 	m := Model{
 		state: TListState,
+		mcontext: ModelContext{
+			CurrentTeamName:   "",
+			CurrentTeamID:     0,
+			CurrentPlayerName: "",
+			CurrentPlayerID:   0,
+		},
 	}
 	initTListForm(&m)
 	return m

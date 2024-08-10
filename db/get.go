@@ -32,6 +32,12 @@ func GetPlayersByTeamID(teamID uint) []model.Player {
 	return players
 }
 
+func GetPLayersByTeamName(name string) []model.Player {
+	var players []model.Player
+	db.Joins("Team").Where("team.name = ?", name).Find(&players)
+	return players
+}
+
 func GetTeams() []model.Team {
 	var teams []model.Team
 	db.Find(&teams)

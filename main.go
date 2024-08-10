@@ -3,6 +3,7 @@ package main
 import (
 	"core-cli/db"
 	"core-cli/github"
+	"core-cli/logging"
 	"core-cli/tui"
 	"log"
 
@@ -12,6 +13,8 @@ import (
 
 func main() {
 	godotenv.Load()
+	logging.SetupLogToFile()
+	defer logging.CloseLogToFile()
 
 	err := github.NewClient()
 	if err != nil {
