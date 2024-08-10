@@ -8,10 +8,3 @@ type Player struct {
 	GithubName string
 	TeamID     uint
 }
-
-type Team struct {
-	gorm.Model
-	Name     string
-	RepoName string
-	Players  []Player
-}
