@@ -10,8 +10,8 @@ type State int
 const (
 	TListState State = iota
 	TDetailsState
-	PListState
 	PAddState
+	PDetailsState
 )
 
 type Model struct {
@@ -19,15 +19,16 @@ type Model struct {
 	mcontext     ModelContext
 	tListForm    *huh.Form
 	tDetailsForm *huh.Form
-	pListForm    *huh.Form
 	pAddForm     *huh.Form
+	pDetailsForm *huh.Form
 }
 
 type ModelContext struct {
-	CurrentTeamName   string
 	CurrentTeamID     uint
-	CurrentPlayerName string
+	CurrentTeamName   string
 	CurrentPlayerID   uint
+	CurrentGithubName string
+	CurrentIntraName  string
 }
 
 func NewModel() Model {
@@ -36,7 +37,7 @@ func NewModel() Model {
 		mcontext: ModelContext{
 			CurrentTeamName:   "",
 			CurrentTeamID:     0,
-			CurrentPlayerName: "",
+			CurrentGithubName: "",
 			CurrentPlayerID:   0,
 		},
 	}
