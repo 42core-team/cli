@@ -39,6 +39,7 @@ func updateTListForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	if m.tListForm.State == huh.StateCompleted {
+		m.mcontext.CurrentTeamName = m.tListForm.GetString("teamName")
 		return switchState(m, TDetailsState)
 	}
 
@@ -48,7 +49,7 @@ func updateTListForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
 func initTDetailsForm(m *Model) tea.Cmd {
 	var nameList []string = []string{"<New>"}
 
-	for _, player := range db.GetPlayersByTeamID(0) {
+	for _, player := range db.GetPLayersByTeamName(m.mcontext.CurrentTeamName) {
 		nameList = append(nameList, player.IntraName)
 	}
 
@@ -122,6 +123,7 @@ func updatePAddForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
 		db.SavePlayer(&model.Player{
 			GithubName: m.pAddForm.GetString("githubName"),
 			IntraName:  m.pAddForm.GetString("intraName"),
+			TeamID:     db.GetTeamByName(m.mcontext.CurrentTeamName).ID,
 		})
 		return switchState(m, TListState)
 	}

@@ -3,11 +3,13 @@ package db
 import (
 	"core-cli/github"
 	"core-cli/model"
+	"log"
 	"os"
 	"strings"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var db *gorm.DB
@@ -18,7 +20,16 @@ func Connect() {
 	}
 
 	var err error
-	db, err = gorm.Open(sqlite.Open("./cli-db/coreEvent.db"), &gorm.Config{})
+	db, err = gorm.Open(sqlite.Open("./cli-db/coreEvent.db"), &gorm.Config{
+		Logger: logger.New(
+			log.Default(),
+			logger.Config{
+				SlowThreshold: 0,
+				LogLevel:      logger.Info,
+				Colorful:      false,
+			},
+		),
+	})
 	if err != nil {
 		panic(err)
 	}
