@@ -53,6 +53,8 @@ func initTDetailsForm(m *Model) tea.Cmd {
 		nameList = append(nameList, player.IntraName)
 	}
 
+	m.mcontext.CurrentTeamID = db.GetTeamByName(m.mcontext.CurrentTeamName).ID
+
 	m.tDetailsForm = huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[string]().
@@ -97,6 +99,9 @@ func initPAddForm(m *Model) tea.Cmd {
 					if input == "" {
 						return errors.New("player name cannot be empty")
 					}
+					if db.PlayerExistsByGithubName(input) {
+						return errors.New(input + " already exists in the db")
+					}
 					if !github.GithubUserExists(input) {
 						return errors.New(input + " does not exist on github")
 					}
@@ -104,7 +109,16 @@ func initPAddForm(m *Model) tea.Cmd {
 				}),
 			huh.NewInput().
 				Key("intraName").
-				Description("Enter the intra username of the player"),
+				Description("Enter the intra username of the player").
+				Validate(func(input string) error {
+					if input == "" {
+						return errors.New("player name cannot be empty")
+					}
+					if db.PlayerExistsByIntraName(input) {
+						return errors.New(input + " already exists in the db")
+					}
+					return nil
+				}),
 		),
 	)
 	return m.pAddForm.Init()
@@ -123,9 +137,9 @@ func updatePAddForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
 		db.SavePlayer(&model.Player{
 			GithubName: m.pAddForm.GetString("githubName"),
 			IntraName:  m.pAddForm.GetString("intraName"),
-			TeamID:     db.GetTeamByName(m.mcontext.CurrentTeamName).ID,
+			TeamID:     m.mcontext.CurrentTeamID,
 		})
-		return switchState(m, TListState)
+		return switchState(m, TDetailsState)
 	}
 
 	return m, tea.Batch(cmds...)

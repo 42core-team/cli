@@ -14,7 +14,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch m.state {
 			case TDetailsState:
 				return switchState(&m, TListState)
-			case PListState:
+			case PAddState:
 				return switchState(&m, TDetailsState)
 			}
 		}
