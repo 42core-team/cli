@@ -2,9 +2,6 @@ package tui
 
 import (
 	"core-cli/db"
-	"core-cli/github"
-	"core-cli/model"
-	"errors"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
@@ -81,65 +78,10 @@ func updateTDetailsForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
 		case "<New>":
 			return switchState(m, PAddState)
 		default:
-			return switchState(m, TListState)
+			m.mcontext.CurrentGithubName = m.tDetailsForm.GetString("teamDetails")
+			m.mcontext.CurrentPlayerID = db.GetPlayerByIntraName(m.mcontext.CurrentGithubName).ID
+			return switchState(m, PDetailsState)
 		}
-	}
-
-	return m, tea.Batch(cmds...)
-}
-
-func initPAddForm(m *Model) tea.Cmd {
-	m.pAddForm = huh.NewForm(
-		huh.NewGroup(
-			huh.NewInput().
-				Key("githubName").
-				Title("Add Player").
-				Description("Enter the github username of the player").
-				Validate(func(input string) error {
-					if input == "" {
-						return errors.New("player name cannot be empty")
-					}
-					if db.PlayerExistsByGithubName(input) {
-						return errors.New(input + " already exists in the db")
-					}
-					if !github.GithubUserExists(input) {
-						return errors.New(input + " does not exist on github")
-					}
-					return nil
-				}),
-			huh.NewInput().
-				Key("intraName").
-				Description("Enter the intra username of the player").
-				Validate(func(input string) error {
-					if input == "" {
-						return errors.New("player name cannot be empty")
-					}
-					if db.PlayerExistsByIntraName(input) {
-						return errors.New(input + " already exists in the db")
-					}
-					return nil
-				}),
-		),
-	)
-	return m.pAddForm.Init()
-}
-
-func updatePAddForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
-	var cmds []tea.Cmd
-
-	form, cmd := m.pAddForm.Update(*msg)
-	if f, ok := form.(*huh.Form); ok {
-		m.pAddForm = f
-		cmds = append(cmds, cmd)
-	}
-
-	if m.pAddForm.State == huh.StateCompleted {
-		db.SavePlayer(&model.Player{
-			GithubName: m.pAddForm.GetString("githubName"),
-			IntraName:  m.pAddForm.GetString("intraName"),
-			TeamID:     m.mcontext.CurrentTeamID,
-		})
-		return switchState(m, TDetailsState)
 	}
 
 	return m, tea.Batch(cmds...)

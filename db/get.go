@@ -2,6 +2,12 @@ package db
 
 import "core-cli/model"
 
+func GetPlayer(id uint) *model.Player {
+	var player model.Player
+	db.First(&player, id)
+	return &player
+}
+
 func GetPlayerByIntraName(intraName string) *model.Player {
 	var player model.Player
 	db.Where("intra_name = ?", intraName).First(&player)

@@ -16,6 +16,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return switchState(&m, TListState)
 			case PAddState:
 				return switchState(&m, TDetailsState)
+			case PDetailsState:
+				return switchState(&m, TDetailsState)
 			}
 		}
 	}
@@ -27,6 +29,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return updateTDetailsForm(&m, &msg)
 	case PAddState:
 		return updatePAddForm(&m, &msg)
+	case PDetailsState:
+		return updatePDetailsForm(&m, &msg)
 	}
 
 	return m, nil
@@ -38,10 +42,10 @@ func (m Model) View() string {
 		return m.tListForm.View()
 	case TDetailsState:
 		return m.tDetailsForm.View()
-	case PListState:
-		return m.pListForm.View()
 	case PAddState:
 		return m.pAddForm.View()
+	case PDetailsState:
+		return m.pDetailsForm.View()
 	}
 	return "Empty view"
 }
