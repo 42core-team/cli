@@ -67,11 +67,12 @@ func initTDetailsForm(m *Model) tea.Cmd {
 func updateTDetailsForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
 
-	form, cmd := m.tDetailsForm.Update(msg)
+	form, cmd := m.tDetailsForm.Update(*msg)
 	if f, ok := form.(*huh.Form); ok {
 		m.tDetailsForm = f
 		cmds = append(cmds, cmd)
 	}
+
 	if m.tDetailsForm.State == huh.StateCompleted {
 		switch m.tDetailsForm.GetString("teamDetails") {
 		case "<New>":
@@ -111,7 +112,7 @@ func initPAddForm(m *Model) tea.Cmd {
 func updatePAddForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
 
-	form, cmd := m.pAddForm.Update(msg)
+	form, cmd := m.pAddForm.Update(*msg)
 	if f, ok := form.(*huh.Form); ok {
 		m.pAddForm = f
 		cmds = append(cmds, cmd)
