@@ -25,9 +25,9 @@ type Model struct {
 
 type ModelContext struct {
 	CurrentTeamName   string
-	CurrentTeamID     int
+	CurrentTeamID     uint
 	CurrentPlayerName string
-	CurrentPlayerID   int
+	CurrentPlayerID   uint
 }
 
 func NewModel() Model {
