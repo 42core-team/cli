@@ -3,12 +3,11 @@ package tui
 import (
 	"core-cli/db"
 
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
 )
 
-func initTListForm(m *Model) tea.Cmd {
-	m.tListForm = huh.NewForm(
+func runTListModel() error {
+	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[uint]().
 				Key("teamName").
@@ -25,28 +24,29 @@ func initTListForm(m *Model) tea.Cmd {
 				Description("Choose a team to view details or create a new one"),
 		),
 	)
-	return m.tListForm.Init()
+
+	return form.Run()
 }
 
-func updateTListForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
-	var cmds []tea.Cmd
+// func updateTListForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
+// 	var cmds []tea.Cmd
 
-	form, cmd := m.tListForm.Update(*msg)
-	if f, ok := form.(*huh.Form); ok {
-		m.tListForm = f
-		cmds = append(cmds, cmd)
-	}
+// 	form, cmd := m.tListForm.Update(*msg)
+// 	if f, ok := form.(*huh.Form); ok {
+// 		m.tListForm = f
+// 		cmds = append(cmds, cmd)
+// 	}
 
-	if m.tListForm.State == huh.StateCompleted {
-		m.mcontext.CurrentTeamID = m.tListForm.Get("teamName").(uint)
-		return switchState(m, TDetailsState)
-	}
+// 	if m.tListForm.State == huh.StateCompleted {
+// 		m.mcontext.CurrentTeamID = m.tListForm.Get("teamName").(uint)
+// 		return switchState(m, TDetailsState)
+// 	}
 
-	return m, tea.Batch(cmds...)
-}
+// 	return m, tea.Batch(cmds...)
+// }
 
-func initTDetailsForm(m *Model) tea.Cmd {
-	m.tDetailsForm = huh.NewForm(
+func runTDetailsForm(playerID uint) error {
+	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[uint]().
 				Key("teamDetails").
@@ -56,34 +56,35 @@ func initTDetailsForm(m *Model) tea.Cmd {
 					var options []huh.Option[uint]
 					options = append(options, huh.NewOption[uint]("<New>", 0))
 
-					for _, player := range db.GetPlayersByTeamID(m.mcontext.CurrentTeamID) {
+					for _, player := range db.GetPlayersByTeamID(playerID) {
 						options = append(options, huh.NewOption(player.IntraName, player.ID))
 					}
 					return options
 				}, "static"),
 		),
 	)
-	return m.tDetailsForm.Init()
+
+	return form.Run()
 }
 
-func updateTDetailsForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
-	var cmds []tea.Cmd
+// func updateTDetailsForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
+// 	var cmds []tea.Cmd
 
-	form, cmd := m.tDetailsForm.Update(*msg)
-	if f, ok := form.(*huh.Form); ok {
-		m.tDetailsForm = f
-		cmds = append(cmds, cmd)
-	}
+// 	form, cmd := m.tDetailsForm.Update(*msg)
+// 	if f, ok := form.(*huh.Form); ok {
+// 		m.tDetailsForm = f
+// 		cmds = append(cmds, cmd)
+// 	}
 
-	if m.tDetailsForm.State == huh.StateCompleted {
-		playerID := m.tDetailsForm.Get("teamDetails").(uint)
-		if playerID == 0 {
-			return switchState(m, PAddState)
-		}
+// 	if m.tDetailsForm.State == huh.StateCompleted {
+// 		playerID := m.tDetailsForm.Get("teamDetails").(uint)
+// 		if playerID == 0 {
+// 			return switchState(m, PAddState)
+// 		}
 
-		m.mcontext.CurrentPlayerID = playerID
-		return switchState(m, PDetailsState)
-	}
+// 		m.mcontext.CurrentPlayerID = playerID
+// 		return switchState(m, PDetailsState)
+// 	}
 
-	return m, tea.Batch(cmds...)
-}
+// 	return m, tea.Batch(cmds...)
+// }
