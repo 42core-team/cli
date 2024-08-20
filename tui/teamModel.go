@@ -54,6 +54,7 @@ func runTDetails(teamID int) int {
 					var options []huh.Option[int]
 					options = append(options, huh.NewOption[int]("<Back>", GoBack))
 					options = append(options, huh.NewOption[int]("<New>", NewEntry))
+					options = append(options, huh.NewOption[int]("<Delete>", DeleteEntry))
 
 					for _, player := range db.GetPlayersByTeamID(uint(teamID)) {
 						options = append(options, huh.NewOption(player.IntraName, int(player.ID)))
@@ -72,4 +73,33 @@ func runTDetails(teamID int) int {
 	}
 
 	return playerID
+}
+
+func runTDelete(teamID int) int {
+	team := db.GetTeam(uint(teamID))
+
+	form := huh.NewForm(
+		huh.NewGroup(
+			huh.NewConfirm().
+				Title("Delete Team " + team.Name).
+				Description("Do you really want to delete the team and all of its players?").
+				Key("delete"),
+		),
+	)
+
+	err := form.Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return UserAborted
+		}
+		log.Fatal(err)
+	}
+
+	if form.GetBool("delete") {
+		ShowLoadingScreen("Deleting team", func() {
+			db.DeleteTeamAndPlayer(team)
+		})
+	}
+
+	return Nothing
 }
