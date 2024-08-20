@@ -95,7 +95,7 @@ func runTDetails(teamID int) int {
 					options = append(options, huh.NewOption[int]("<Delete>", DeleteEntry))
 
 					for _, player := range db.GetPlayersByTeamID(uint(teamID)) {
-						options = append(options, huh.NewOption(player.IntraName, int(player.ID)))
+						options = append(options, huh.NewOption(player.IntraName+" - "+player.GithubName, int(player.ID)))
 					}
 					return options
 				}, &teamID),

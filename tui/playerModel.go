@@ -53,9 +53,15 @@ func runPAddForm(teamID int) int {
 	}
 
 	ShowLoadingScreen("Adding player", func() {
+		githubUser, err := github.GetGithubUserByUserName(form.GetString("githubName"))
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		db.SavePlayer(&model.Player{
 			GithubName: form.GetString("githubName"),
 			IntraName:  form.GetString("intraName"),
+			GithubID:   *githubUser.ID,
 			TeamID:     uint(teamID),
 		})
 	})
@@ -113,6 +119,12 @@ func runPDetailsForm(playerID int) int {
 
 	if form.GetBool("save") {
 		ShowLoadingScreen("Saving player", func() {
+			githubUser, err := github.GetGithubUserByUserName(form.GetString("githubName"))
+			if err != nil {
+				log.Fatal(err)
+			}
+			player.GithubID = *githubUser.ID
+
 			db.SavePlayer(player)
 		})
 	} else if form.GetBool("delete") {
