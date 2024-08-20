@@ -17,7 +17,7 @@ Loop:
 		case UserAborted:
 			break Loop
 		case NewEntry:
-			// runTAddForm()
+			runTAddForm()
 		default:
 			handleTDetails(teamID)
 		}

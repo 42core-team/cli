@@ -13,3 +13,9 @@ func PlayerExistsByGithubName(githubName string) bool {
 	db.Model(&model.Player{}).Where("github_name = ?", githubName).Count(&count)
 	return count > 0
 }
+
+func TeamExistsByName(name string) bool {
+	var count int64
+	db.Model(&model.Team{}).Where("name = ?", name).Count(&count)
+	return count > 0
+}
