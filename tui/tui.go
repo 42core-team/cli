@@ -1,10 +1,11 @@
 package tui
 
-import "log"
-
 func Start() {
-	err := runTListModel()
-	if err != nil {
-		log.Fatal(err)
+	for {
+		teamID := runTList()
+		if teamID == -1 {
+			break
+		}
+		runTDetails(uint(teamID))
 	}
 }

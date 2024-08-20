@@ -2,21 +2,25 @@ package tui
 
 import (
 	"core-cli/db"
+	"log"
 
 	"github.com/charmbracelet/huh"
 )
 
-func runTListModel() error {
+func runTList() int {
+	var teamID int = -1
+
 	form := huh.NewForm(
 		huh.NewGroup(
-			huh.NewSelect[uint]().
-				Key("teamName").
-				OptionsFunc(func() []huh.Option[uint] {
-					var options []huh.Option[uint]
-					options = append(options, huh.NewOption[uint]("<New>", 0))
+			huh.NewSelect[int]().
+				Value(&teamID).
+				OptionsFunc(func() []huh.Option[int] {
+					var options []huh.Option[int]
+					options = append(options, huh.NewOption[int]("<Back>", -1))
+					options = append(options, huh.NewOption[int]("<New>", 0))
 
 					for _, team := range db.GetTeams() {
-						options = append(options, huh.NewOption(team.Name, team.ID))
+						options = append(options, huh.NewOption(team.Name, int(team.ID)))
 					}
 					return options
 				}, "static").
@@ -25,7 +29,15 @@ func runTListModel() error {
 		),
 	)
 
-	return form.Run()
+	err := form.Run()
+	if err != nil {
+		if err.Error() == "user aborted" {
+			return -1
+		}
+		log.Fatal(err)
+	}
+
+	return teamID
 }
 
 // func updateTListForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
@@ -45,7 +57,7 @@ func runTListModel() error {
 // 	return m, tea.Batch(cmds...)
 // }
 
-func runTDetailsForm(playerID uint) error {
+func runTDetails(playerID uint) error {
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[uint]().

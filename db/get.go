@@ -20,6 +20,12 @@ func GetPlayerByGithubName(githubName string) *model.Player {
 	return &player
 }
 
+func GetTeam(id uint) *model.Team {
+	var team model.Team
+	db.First(&team, id)
+	return &team
+}
+
 func GetTeamByName(name string) *model.Team {
 	var team model.Team
 	db.Where("name = ?", name).First(&team)
