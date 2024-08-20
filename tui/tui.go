@@ -1,9 +1,11 @@
 package tui
 
 const (
-	Nothing     = -3
-	UserAborted = -2
-	GoBack      = -1
+	Nothing     = -5
+	UserAborted = -4
+	GoBack      = -3
+	Success     = -2
+	DeleteEntry = -1
 	NewEntry    = 0
 )
 
@@ -33,6 +35,11 @@ Loop:
 			break Loop
 		case NewEntry:
 			runPAddForm(teamID)
+		case DeleteEntry:
+			switch runTDelete(teamID) {
+			case Success:
+				break Loop
+			}
 		default:
 			runPDetailsForm(playerID)
 		}
