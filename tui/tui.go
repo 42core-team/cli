@@ -1,7 +1,9 @@
 package tui
 
 const (
-	UserAborted = -1
+	Nothing     = -3
+	UserAborted = -2
+	GoBack      = -1
 	NewEntry    = 0
 )
 
@@ -15,7 +17,22 @@ Loop:
 		case NewEntry:
 			// runTAddForm()
 		default:
-			runTDetails(uint(teamID))
+			handleTDetails(teamID)
+		}
+	}
+}
+
+func handleTDetails(teamID int) {
+Loop:
+	for {
+		playerID := runTDetails(teamID)
+		switch playerID {
+		case UserAborted:
+			break Loop
+		case GoBack:
+			break Loop
+		case NewEntry:
+			runPAddForm(teamID)
 		}
 	}
 }
