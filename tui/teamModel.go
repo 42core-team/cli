@@ -2,13 +2,14 @@ package tui
 
 import (
 	"core-cli/db"
+	"errors"
 	"log"
 
 	"github.com/charmbracelet/huh"
 )
 
 func runTList() int {
-	var teamID int = -1
+	var teamID int = 0
 
 	form := huh.NewForm(
 		huh.NewGroup(
@@ -16,7 +17,6 @@ func runTList() int {
 				Value(&teamID).
 				OptionsFunc(func() []huh.Option[int] {
 					var options []huh.Option[int]
-					options = append(options, huh.NewOption[int]("<Back>", -1))
 					options = append(options, huh.NewOption[int]("<New>", 0))
 
 					for _, team := range db.GetTeams() {
@@ -31,8 +31,8 @@ func runTList() int {
 
 	err := form.Run()
 	if err != nil {
-		if err.Error() == "user aborted" {
-			return -1
+		if errors.Is(err, huh.ErrUserAborted) {
+			return UserAborted
 		}
 		log.Fatal(err)
 	}
