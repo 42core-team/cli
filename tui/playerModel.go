@@ -63,29 +63,9 @@ func runPAddForm(teamID int) int {
 	return Nothing
 }
 
-// func updatePAddForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
-// 	var cmds []tea.Cmd
-
-// 	form, cmd := m.pAddForm.Update(*msg)
-// 	if f, ok := form.(*huh.Form); ok {
-// 		m.pAddForm = f
-// 		cmds = append(cmds, cmd)
-// 	}
-
-// 	if m.pAddForm.State == huh.StateCompleted {
-// 		db.SavePlayer(&model.Player{
-// 			GithubName: m.pAddForm.GetString("githubName"),
-// 			IntraName:  m.pAddForm.GetString("intraName"),
-// 			TeamID:     m.mcontext.CurrentTeamID,
-// 		})
-// 		return switchState(m, TDetailsState)
-// 	}
-
-// 	return m, tea.Batch(cmds...)
-// }
-
-func runPDetailsForm(playerID uint) error {
-	player := db.GetPlayer(playerID)
+func runPDetailsForm(playerID int) int {
+	player := db.GetPlayer(uint(playerID))
+	playerCopy := *player
 
 	form := huh.NewForm(
 		huh.NewGroup(
@@ -97,10 +77,10 @@ func runPDetailsForm(playerID uint) error {
 					if input == "" {
 						return errors.New("player name cannot be empty")
 					}
-					if input != player.GithubName && db.PlayerExistsByGithubName(input) {
+					if input != playerCopy.GithubName && db.PlayerExistsByGithubName(input) {
 						return errors.New(input + " already exists in the db")
 					}
-					if input != player.GithubName && !github.GithubUserExists(input) {
+					if input != playerCopy.GithubName && !github.GithubUserExists(input) {
 						return errors.New(input + " does not exist on github")
 					}
 					return nil
@@ -119,30 +99,27 @@ func runPDetailsForm(playerID uint) error {
 					return nil
 				}),
 			huh.NewConfirm().Key("save").Title("Save Changes").Description("Do you want to save the changes?"),
+			huh.NewConfirm().Key("delete").Title("Delete Player").Description("Do you want to delete the player?"),
 		),
 	)
 
-	return form.Run()
+	err := form.Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return UserAborted
+		}
+		log.Fatal(err)
+	}
+
+	if form.GetBool("save") {
+		ShowLoadingScreen("Saving player", func() {
+			db.SavePlayer(player)
+		})
+	} else if form.GetBool("delete") {
+		ShowLoadingScreen("Deleting player", func() {
+			db.DeletePlayer(player)
+		})
+	}
+
+	return Nothing
 }
-
-// func updatePDetailsForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
-// 	var cmds []tea.Cmd
-
-// 	form, cmd := m.pDetailsForm.Update(*msg)
-// 	if f, ok := form.(*huh.Form); ok {
-// 		m.pDetailsForm = f
-// 		cmds = append(cmds, cmd)
-// 	}
-
-// 	if m.pDetailsForm.State == huh.StateCompleted {
-// 		if m.pDetailsForm.GetBool("save") {
-// 			player := db.GetPlayer(m.mcontext.CurrentPlayerID)
-// 			player.GithubName = m.pDetailsForm.GetString("githubName")
-// 			player.IntraName = m.pDetailsForm.GetString("intraName")
-// 			db.SavePlayer(player)
-// 		}
-// 		return switchState(m, TDetailsState)
-// 	}
-
-// 	return m, tea.Batch(cmds...)
-// }

@@ -33,6 +33,8 @@ Loop:
 			break Loop
 		case NewEntry:
 			runPAddForm(teamID)
+		default:
+			runPDetailsForm(playerID)
 		}
 	}
 }
