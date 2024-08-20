@@ -1,51 +1,47 @@
 package tui
 
-import (
-	tea "github.com/charmbracelet/bubbletea"
+const (
+	Nothing     = -5
+	UserAborted = -4
+	GoBack      = -3
+	Success     = -2
+	DeleteEntry = -1
+	NewEntry    = 0
 )
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "q":
-			return m, tea.Quit
-		case "esc":
-			switch m.state {
-			case TDetailsState:
-				return switchState(&m, TListState)
-			case PAddState:
-				return switchState(&m, TDetailsState)
-			case PDetailsState:
-				return switchState(&m, TDetailsState)
-			}
+func Start() {
+Loop:
+	for {
+		teamID := runTList()
+		switch teamID {
+		case UserAborted:
+			break Loop
+		case NewEntry:
+			runTAddForm()
+		default:
+			handleTDetails(teamID)
 		}
 	}
-
-	switch m.state {
-	case TListState:
-		return updateTListForm(&m, &msg)
-	case TDetailsState:
-		return updateTDetailsForm(&m, &msg)
-	case PAddState:
-		return updatePAddForm(&m, &msg)
-	case PDetailsState:
-		return updatePDetailsForm(&m, &msg)
-	}
-
-	return m, nil
 }
 
-func (m Model) View() string {
-	switch m.state {
-	case TListState:
-		return m.tListForm.View()
-	case TDetailsState:
-		return m.tDetailsForm.View()
-	case PAddState:
-		return m.pAddForm.View()
-	case PDetailsState:
-		return m.pDetailsForm.View()
+func handleTDetails(teamID int) {
+Loop:
+	for {
+		playerID := runTDetails(teamID)
+		switch playerID {
+		case UserAborted:
+			break Loop
+		case GoBack:
+			break Loop
+		case NewEntry:
+			runPAddForm(teamID)
+		case DeleteEntry:
+			switch runTDelete(teamID) {
+			case Success:
+				break Loop
+			}
+		default:
+			runPDetailsForm(playerID)
+		}
 	}
-	return "Empty view"
 }

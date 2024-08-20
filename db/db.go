@@ -31,7 +31,7 @@ func Connect() {
 		),
 	})
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	db.AutoMigrate(model.Player{}, model.Team{})
@@ -49,7 +49,7 @@ func pullDatabase() {
 			if err != nil {
 				repo, err = github.CreateRepo("cli-db")
 				if err != nil {
-					panic(err)
+					log.Fatal(err)
 				}
 			}
 
@@ -58,11 +58,11 @@ func pullDatabase() {
 				if strings.Contains(err.Error(), "remote repository is empty") {
 					os.Mkdir("./cli-db", 0755)
 				} else {
-					panic(err)
+					log.Fatal(err)
 				}
 			}
 		} else if !strings.Contains(err.Error(), "remote repository is empty") {
-			panic(err)
+			log.Fatal(err)
 		}
 	}
 }
@@ -70,6 +70,6 @@ func pullDatabase() {
 func pushDatabase() {
 	err := github.CommitAndPush("./cli-db", "Update database")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }

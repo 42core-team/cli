@@ -7,23 +7,27 @@ import (
 	"core-cli/tui"
 	"log"
 
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	godotenv.Load()
-	logging.SetupLogToFile()
+	tui.ShowLoadingScreen("Loading...", func() {
+		godotenv.Load()
+		logging.SetupLogToFile()
+	})
+
 	defer logging.CloseLogToFile()
 
-	err := github.NewClient()
-	if err != nil {
-		log.Fatalln("Error creating GitHub client:", err)
-	}
-	db.Connect()
+	tui.ShowLoadingScreen("Init Github client...", func() {
+		err := github.NewClient()
+		if err != nil {
+			log.Fatalln("Error creating GitHub client:", err)
+		}
+	})
 
-	_, err = tea.NewProgram(tui.NewModel()).Run()
-	if err != nil {
-		log.Fatalln("Error running program:", err)
-	}
+	tui.ShowLoadingScreen("Connect to database...", func() {
+		db.Connect()
+	})
+
+	tui.Start()
 }

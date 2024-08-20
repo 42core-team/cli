@@ -2,22 +2,26 @@ package tui
 
 import (
 	"core-cli/db"
+	"core-cli/model"
+	"errors"
+	"log"
 
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
 )
 
-func initTListForm(m *Model) tea.Cmd {
-	m.tListForm = huh.NewForm(
+func runTList() int {
+	var teamID int = 0
+
+	form := huh.NewForm(
 		huh.NewGroup(
-			huh.NewSelect[uint]().
-				Key("teamName").
-				OptionsFunc(func() []huh.Option[uint] {
-					var options []huh.Option[uint]
-					options = append(options, huh.NewOption[uint]("<New>", 0))
+			huh.NewSelect[int]().
+				Value(&teamID).
+				OptionsFunc(func() []huh.Option[int] {
+					var options []huh.Option[int]
+					options = append(options, huh.NewOption[int]("<New>", NewEntry))
 
 					for _, team := range db.GetTeams() {
-						options = append(options, huh.NewOption(team.Name, team.ID))
+						options = append(options, huh.NewOption(team.Name, int(team.ID)))
 					}
 					return options
 				}, "static").
@@ -25,65 +29,116 @@ func initTListForm(m *Model) tea.Cmd {
 				Description("Choose a team to view details or create a new one"),
 		),
 	)
-	return m.tListForm.Init()
-}
 
-func updateTListForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
-	var cmds []tea.Cmd
-
-	form, cmd := m.tListForm.Update(*msg)
-	if f, ok := form.(*huh.Form); ok {
-		m.tListForm = f
-		cmds = append(cmds, cmd)
+	err := form.Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return UserAborted
+		}
+		log.Fatal(err)
 	}
 
-	if m.tListForm.State == huh.StateCompleted {
-		m.mcontext.CurrentTeamID = m.tListForm.Get("teamName").(uint)
-		return switchState(m, TDetailsState)
-	}
-
-	return m, tea.Batch(cmds...)
+	return teamID
 }
 
-func initTDetailsForm(m *Model) tea.Cmd {
-	m.tDetailsForm = huh.NewForm(
+func runTAddForm() int {
+	form := huh.NewForm(
 		huh.NewGroup(
-			huh.NewSelect[uint]().
+			huh.NewInput().
+				Key("name").
+				Title("Add Team").
+				Description("Enter the name of the team").
+				Validate(func(input string) error {
+					if input == "" {
+						return errors.New("team name cannot be empty")
+					}
+					if db.TeamExistsByName(input) {
+						return errors.New(input + " already exists in the db")
+					}
+					return nil
+				}),
+		),
+	)
+
+	err := form.Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return UserAborted
+		}
+		log.Fatal(err)
+	}
+
+	ShowLoadingScreen("Adding team", func() {
+		db.SaveTeam(&model.Team{
+			Name:     form.GetString("name"),
+			RepoName: form.GetString("repoName"),
+		})
+	})
+
+	return Nothing
+}
+
+func runTDetails(teamID int) int {
+	var playerID int = GoBack
+
+	form := huh.NewForm(
+		huh.NewGroup(
+			huh.NewSelect[int]().
+				Value(&playerID).
 				Key("teamDetails").
 				Title("Team Details").
 				Description("Choose an option").
-				OptionsFunc(func() []huh.Option[uint] {
-					var options []huh.Option[uint]
-					options = append(options, huh.NewOption[uint]("<New>", 0))
+				OptionsFunc(func() []huh.Option[int] {
+					var options []huh.Option[int]
+					options = append(options, huh.NewOption[int]("<Back>", GoBack))
+					options = append(options, huh.NewOption[int]("<New>", NewEntry))
+					options = append(options, huh.NewOption[int]("<Delete>", DeleteEntry))
 
-					for _, player := range db.GetPlayersByTeamID(m.mcontext.CurrentTeamID) {
-						options = append(options, huh.NewOption(player.IntraName, player.ID))
+					for _, player := range db.GetPlayersByTeamID(uint(teamID)) {
+						options = append(options, huh.NewOption(player.IntraName+" - "+player.GithubName, int(player.ID)))
 					}
 					return options
-				}, "static"),
+				}, &teamID),
 		),
 	)
-	return m.tDetailsForm.Init()
+
+	err := form.Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return UserAborted
+		}
+		log.Fatal(err)
+	}
+
+	return playerID
 }
 
-func updateTDetailsForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
-	var cmds []tea.Cmd
+func runTDelete(teamID int) int {
+	team := db.GetTeam(uint(teamID))
 
-	form, cmd := m.tDetailsForm.Update(*msg)
-	if f, ok := form.(*huh.Form); ok {
-		m.tDetailsForm = f
-		cmds = append(cmds, cmd)
-	}
+	form := huh.NewForm(
+		huh.NewGroup(
+			huh.NewConfirm().
+				Title("Delete Team " + team.Name).
+				Description("Do you really want to delete the team and all of its players?").
+				Key("delete"),
+		),
+	)
 
-	if m.tDetailsForm.State == huh.StateCompleted {
-		playerID := m.tDetailsForm.Get("teamDetails").(uint)
-		if playerID == 0 {
-			return switchState(m, PAddState)
+	err := form.Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return UserAborted
 		}
-
-		m.mcontext.CurrentPlayerID = playerID
-		return switchState(m, PDetailsState)
+		log.Fatal(err)
 	}
 
-	return m, tea.Batch(cmds...)
+	if form.GetBool("delete") {
+		ShowLoadingScreen("Deleting team", func() {
+			db.DeleteTeamAndPlayer(team)
+		})
+		return Success
+	}
+
+	return Nothing
 }
