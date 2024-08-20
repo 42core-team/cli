@@ -3,12 +3,14 @@ package tui
 import (
 	"core-cli/db"
 	"core-cli/github"
+	"core-cli/model"
 	"errors"
+	"log"
 
 	"github.com/charmbracelet/huh"
 )
 
-func runPAddForm() error {
+func runPAddForm(teamID int) int {
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
@@ -42,7 +44,23 @@ func runPAddForm() error {
 		),
 	)
 
-	return form.Run()
+	err := form.Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return UserAborted
+		}
+		log.Fatal(err)
+	}
+
+	ShowLoadingScreen("Adding player", func() {
+		db.SavePlayer(&model.Player{
+			GithubName: form.GetString("githubName"),
+			IntraName:  form.GetString("intraName"),
+			TeamID:     uint(teamID),
+		})
+	})
+
+	return Nothing
 }
 
 // func updatePAddForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {

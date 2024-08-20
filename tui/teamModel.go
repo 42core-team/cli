@@ -17,7 +17,7 @@ func runTList() int {
 				Value(&teamID).
 				OptionsFunc(func() []huh.Option[int] {
 					var options []huh.Option[int]
-					options = append(options, huh.NewOption[int]("<New>", 0))
+					options = append(options, huh.NewOption[int]("<New>", NewEntry))
 
 					for _, team := range db.GetTeams() {
 						options = append(options, huh.NewOption(team.Name, int(team.ID)))
@@ -57,26 +57,38 @@ func runTList() int {
 // 	return m, tea.Batch(cmds...)
 // }
 
-func runTDetails(playerID uint) error {
+func runTDetails(teamID int) int {
+	var playerID int = GoBack
+
 	form := huh.NewForm(
 		huh.NewGroup(
-			huh.NewSelect[uint]().
+			huh.NewSelect[int]().
+				Value(&playerID).
 				Key("teamDetails").
 				Title("Team Details").
 				Description("Choose an option").
-				OptionsFunc(func() []huh.Option[uint] {
-					var options []huh.Option[uint]
-					options = append(options, huh.NewOption[uint]("<New>", 0))
+				OptionsFunc(func() []huh.Option[int] {
+					var options []huh.Option[int]
+					options = append(options, huh.NewOption[int]("<Back>", GoBack))
+					options = append(options, huh.NewOption[int]("<New>", NewEntry))
 
-					for _, player := range db.GetPlayersByTeamID(playerID) {
-						options = append(options, huh.NewOption(player.IntraName, player.ID))
+					for _, player := range db.GetPlayersByTeamID(uint(teamID)) {
+						options = append(options, huh.NewOption(player.IntraName, int(player.ID)))
 					}
 					return options
-				}, "static"),
+				}, &teamID),
 		),
 	)
 
-	return form.Run()
+	err := form.Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return UserAborted
+		}
+		log.Fatal(err)
+	}
+
+	return playerID
 }
 
 // func updateTDetailsForm(m *Model, msg *tea.Msg) (tea.Model, tea.Cmd) {
