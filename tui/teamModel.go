@@ -2,6 +2,7 @@ package tui
 
 import (
 	"core-cli/db"
+	"core-cli/model"
 	"errors"
 	"log"
 
@@ -38,6 +39,43 @@ func runTList() int {
 	}
 
 	return teamID
+}
+
+func runTAddForm() int {
+	form := huh.NewForm(
+		huh.NewGroup(
+			huh.NewInput().
+				Key("name").
+				Title("Add Team").
+				Description("Enter the name of the team").
+				Validate(func(input string) error {
+					if input == "" {
+						return errors.New("team name cannot be empty")
+					}
+					if db.TeamExistsByName(input) {
+						return errors.New(input + " already exists in the db")
+					}
+					return nil
+				}),
+		),
+	)
+
+	err := form.Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return UserAborted
+		}
+		log.Fatal(err)
+	}
+
+	ShowLoadingScreen("Adding team", func() {
+		db.SaveTeam(&model.Team{
+			Name:     form.GetString("name"),
+			RepoName: form.GetString("repoName"),
+		})
+	})
+
+	return Nothing
 }
 
 func runTDetails(teamID int) int {
@@ -99,6 +137,7 @@ func runTDelete(teamID int) int {
 		ShowLoadingScreen("Deleting team", func() {
 			db.DeleteTeamAndPlayer(team)
 		})
+		return Success
 	}
 
 	return Nothing
