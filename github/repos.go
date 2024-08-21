@@ -23,8 +23,8 @@ func DeleteRepo(name string) error {
 	return err
 }
 
-func AddCollaborator(repoName, userName string) error {
-	_, _, err := client.Repositories.AddCollaborator(getGithubContext(), orgName, repoName, userName, &github.RepositoryAddCollaboratorOptions{
+func AddCollaborator(repoName, userID string) error {
+	_, _, err := client.Repositories.AddCollaborator(getGithubContext(), orgName, repoName, userID, &github.RepositoryAddCollaboratorOptions{
 		Permission: "push",
 	})
 	return err
