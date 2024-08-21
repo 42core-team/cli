@@ -15,14 +15,11 @@ func GetRepoFromName(name string) (*github.Repository, error) {
 }
 
 func GetRepoFromURL(urlStr string) (*github.Repository, error) {
-	// Parse the URL to extract the path
 	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}
 
-	// Assuming the URL path is in the format "/owner/repoName"
-	// Split the path to get the owner and repoName
 	pathSegments := strings.Split(strings.Trim(parsedURL.Path, "/"), "/")
 	if len(pathSegments) < 2 {
 		return nil, errors.New("invalid URL format")
@@ -30,7 +27,6 @@ func GetRepoFromURL(urlStr string) (*github.Repository, error) {
 	owner := pathSegments[0]
 	repoName := pathSegments[1]
 
-	// Use the extracted owner and repoName to get the repository details
 	repo, _, err := client.Repositories.Get(context.Background(), owner, repoName)
 	return repo, err
 }
