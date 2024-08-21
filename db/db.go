@@ -45,7 +45,7 @@ func pullDatabase() {
 	err := github.Pull("./cli-db")
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "repository does not exist") {
-			repo, err := github.GetRepo("cli-db")
+			repo, err := github.GetRepoFromName("cli-db")
 			if err != nil {
 				repo, err = github.CreateRepo("cli-db")
 				if err != nil {
