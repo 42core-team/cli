@@ -9,6 +9,6 @@ import (
 func ShowLoadingScreen(msg string, action func()) {
 	err := spinner.New().Title(msg).Action(action).Run()
 	if err != nil {
-		log.Fatal(err)
+		log.Default().Fatal(err)
 	}
 }

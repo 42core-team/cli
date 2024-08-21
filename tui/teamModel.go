@@ -35,7 +35,7 @@ func runTList() int {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return UserAborted
 		}
-		log.Fatal(err)
+		log.Default().Fatal(err)
 	}
 
 	return teamID
@@ -65,7 +65,7 @@ func runTAddForm() int {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return UserAborted
 		}
-		log.Fatal(err)
+		log.Default().Fatal(err)
 	}
 
 	ShowLoadingScreen("Adding team", func() {
@@ -107,7 +107,7 @@ func runTDetails(teamID int) int {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return UserAborted
 		}
-		log.Fatal(err)
+		log.Default().Fatal(err)
 	}
 
 	return playerID
@@ -130,7 +130,7 @@ func runTDelete(teamID int) int {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return UserAborted
 		}
-		log.Fatal(err)
+		log.Default().Fatal(err)
 	}
 
 	if form.GetBool("delete") {

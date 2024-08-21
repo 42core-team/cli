@@ -21,7 +21,7 @@ func main() {
 	tui.ShowLoadingScreen("Init Github client...", func() {
 		err := github.NewClient()
 		if err != nil {
-			log.Fatalln("Error creating GitHub client:", err)
+			log.Default().Fatalln("Error creating GitHub client:", err)
 		}
 	})
 

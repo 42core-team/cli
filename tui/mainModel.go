@@ -19,7 +19,7 @@ func runMain() int {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return UserAborted
 		}
-		log.Fatal(err)
+		log.Default().Fatal(err)
 	}
 
 	switch form.GetString("main") {

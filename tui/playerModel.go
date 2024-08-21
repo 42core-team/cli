@@ -49,13 +49,13 @@ func runPAddForm(teamID int) int {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return UserAborted
 		}
-		log.Fatal(err)
+		log.Default().Fatal(err)
 	}
 
 	ShowLoadingScreen("Adding player", func() {
 		githubUser, err := github.GetGithubUserByUserName(form.GetString("githubName"))
 		if err != nil {
-			log.Fatal(err)
+			log.Default().Fatal(err)
 		}
 
 		db.SavePlayer(&model.Player{
@@ -114,14 +114,14 @@ func runPDetailsForm(playerID int) int {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return UserAborted
 		}
-		log.Fatal(err)
+		log.Default().Fatal(err)
 	}
 
 	if form.GetBool("save") {
 		ShowLoadingScreen("Saving player", func() {
 			githubUser, err := github.GetGithubUserByUserName(form.GetString("githubName"))
 			if err != nil {
-				log.Fatal(err)
+				log.Default().Fatal(err)
 			}
 			player.GithubID = *githubUser.ID
 

@@ -32,7 +32,7 @@ func runCreateRepos() int {
 		if errors.Is(err, huh.ErrUserAborted) {
 			return UserAborted
 		}
-		log.Fatal(err)
+		log.Default().Fatal(err)
 	}
 
 	if !form.GetBool("confirm") {
@@ -41,7 +41,7 @@ func runCreateRepos() int {
 
 	templateRepo, err := github.GetRepoFromURL(form.GetString("url"))
 	if err != nil {
-		log.Fatal(err)
+		log.Default().Fatal(err)
 	}
 
 	teams := db.GetTeams()
@@ -52,7 +52,7 @@ func runCreateRepos() int {
 			if err != nil {
 				repo, err = github.CreateRepoFromTemplate(team.Name, templateRepo)
 				if err != nil {
-					log.Println(err)
+					log.Default().Println(err)
 					return
 				}
 			}
@@ -60,7 +60,7 @@ func runCreateRepos() int {
 			for _, player := range team.Players {
 				err = github.AddCollaborator(*repo.Name, player.GithubName)
 				if err != nil {
-					log.Println(err)
+					log.Default().Println(err)
 					return
 				}
 			}
