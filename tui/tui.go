@@ -10,6 +10,14 @@ const (
 )
 
 func Start() {
+	for {
+		if runMain() == UserAborted {
+			break
+		}
+	}
+}
+
+func handleTList() {
 Loop:
 	for {
 		teamID := runTList()
