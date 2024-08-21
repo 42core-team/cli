@@ -1,11 +1,37 @@
 package github
 
 import (
+	"context"
+	"errors"
+	"net/url"
+	"strings"
+
 	"github.com/google/go-github/v62/github"
 )
 
-func GetRepo(name string) (*github.Repository, error) {
+func GetRepoFromName(name string) (*github.Repository, error) {
 	repo, _, err := client.Repositories.Get(getGithubContext(), orgName, name)
+	return repo, err
+}
+
+func GetRepoFromURL(urlStr string) (*github.Repository, error) {
+	// Parse the URL to extract the path
+	parsedURL, err := url.Parse(urlStr)
+	if err != nil {
+		return nil, err
+	}
+
+	// Assuming the URL path is in the format "/owner/repoName"
+	// Split the path to get the owner and repoName
+	pathSegments := strings.Split(strings.Trim(parsedURL.Path, "/"), "/")
+	if len(pathSegments) < 2 {
+		return nil, errors.New("invalid URL format")
+	}
+	owner := pathSegments[0]
+	repoName := pathSegments[1]
+
+	// Use the extracted owner and repoName to get the repository details
+	repo, _, err := client.Repositories.Get(context.Background(), owner, repoName)
 	return repo, err
 }
 
@@ -18,13 +44,23 @@ func CreateRepo(name string) (*github.Repository, error) {
 	return repo, err
 }
 
+func CreateRepoFromTemplate(name string, template *github.Repository) (*github.Repository, error) {
+	r := &github.Repository{
+		Name:               github.String(name),
+		Private:            github.Bool(true),
+		TemplateRepository: template,
+	}
+	repo, _, err := client.Repositories.Create(getGithubContext(), orgName, r)
+	return repo, err
+}
+
 func DeleteRepo(name string) error {
 	_, err := client.Repositories.Delete(getGithubContext(), orgName, name)
 	return err
 }
 
-func AddCollaborator(repoName, userID string) error {
-	_, _, err := client.Repositories.AddCollaborator(getGithubContext(), orgName, repoName, userID, &github.RepositoryAddCollaboratorOptions{
+func AddCollaborator(repoName, userName string) error {
+	_, _, err := client.Repositories.AddCollaborator(getGithubContext(), orgName, repoName, userName, &github.RepositoryAddCollaboratorOptions{
 		Permission: "push",
 	})
 	return err
