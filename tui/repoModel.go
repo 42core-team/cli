@@ -48,7 +48,22 @@ func runCreateRepos() int {
 
 	for ind, team := range teams {
 		ShowLoadingScreen("Creating repos ("+strconv.Itoa(ind+1)+"/"+strconv.Itoa(len(teams))+")", func() {
-			_, _ = github.CreateRepoFromTemplate(team.Name, templateRepo)
+			repo, err := github.GetRepoFromName(team.Name)
+			if err != nil {
+				repo, err = github.CreateRepoFromTemplate(team.Name, templateRepo)
+				if err != nil {
+					log.Println(err)
+					return
+				}
+			}
+
+			for _, player := range team.Players {
+				err = github.AddCollaborator(*repo.Name, player.GithubName)
+				if err != nil {
+					log.Println(err)
+					return
+				}
+			}
 		})
 	}
 

@@ -41,12 +41,11 @@ func CreateRepo(name string) (*github.Repository, error) {
 }
 
 func CreateRepoFromTemplate(name string, template *github.Repository) (*github.Repository, error) {
-	r := &github.Repository{
-		Name:               github.String(name),
-		Private:            github.Bool(true),
-		TemplateRepository: template,
+	r := &github.TemplateRepoRequest{
+		Name:    github.String(name),
+		Private: github.Bool(true),
 	}
-	repo, _, err := client.Repositories.Create(getGithubContext(), orgName, r)
+	repo, _, err := client.Repositories.CreateFromTemplate(getGithubContext(), *template.Owner.Login, *template.Name, r)
 	return repo, err
 }
 
