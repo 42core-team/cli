@@ -8,4 +8,5 @@ func DeletePlayer(player *model.Player) {
 
 func DeleteTeamAndPlayer(team *model.Team) {
 	db.Delete(team)
+	db.Delete(&model.Player{}, "team_id = ?", team.ID)
 }
