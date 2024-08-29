@@ -52,6 +52,16 @@ func CreateRepoFromTemplate(name string, template *github.Repository) (*github.R
 	return repo, err
 }
 
+func CreateForkRepo(name string, fork *github.Repository) (*github.Repository, error) {
+	r := &github.RepositoryCreateForkOptions{
+		Name:         name,
+		Organization: orgName,
+	}
+
+	repo, _, err := client.Repositories.CreateFork(getGithubContext(), *fork.Owner.Login, *fork.Name, r)
+	return repo, err
+}
+
 func DeleteRepo(name string) error {
 	_, err := client.Repositories.Delete(getGithubContext(), orgName, name)
 	return err
