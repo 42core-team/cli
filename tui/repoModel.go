@@ -5,15 +5,17 @@ import (
 	"core-cli/github"
 	"errors"
 	"log"
+	"os"
 	"strconv"
 
 	"github.com/charmbracelet/huh"
 )
 
 func runCreateRepos() int {
+	defaultRepo := os.Getenv("DEFAULT_TEMPLATE_REPO")
 	form := huh.NewForm(
 		huh.NewGroup(
-			huh.NewInput().Title("Create Repos").Description("Enter the url of the template repo").Key("url").Validate(func(input string) error {
+			huh.NewInput().Title("Create Repos").Description("Enter the url of the template repo").Key("url").Value(&defaultRepo).Validate(func(input string) error {
 				if input == "" {
 					return errors.New("url cannot be empty")
 				}
