@@ -55,10 +55,50 @@ func runCreateRepos() int {
 					log.Default().Println(err)
 					return
 				}
+				team.RepoName = *repo.Name
+				db.SaveTeam(&team)
 			}
 
 			for _, player := range team.Players {
 				err = github.AddCollaborator(*repo.Name, player.GithubName)
+				if err != nil {
+					log.Default().Println(err)
+					return
+				}
+			}
+		})
+	}
+
+	return Nothing
+}
+
+func runRemoveWriteAccess() int {
+	form := huh.NewForm(
+		huh.NewGroup(
+			huh.NewConfirm().Title("Remove Write Access").Description("Do you want to remove write access from all repos?").Key("confirm"),
+		),
+	)
+
+	err := form.Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return UserAborted
+		}
+		log.Default().Fatal(err)
+	}
+
+	if !form.GetBool("confirm") {
+		return GoBack
+	}
+
+	teams := db.GetTeams()
+
+	for ind, team := range teams {
+		ShowLoadingScreen("Removing write access ("+strconv.Itoa(ind+1)+"/"+strconv.Itoa(len(teams))+")", func() {
+			github.ChangeCollaboratorInviteReadOnly(team.RepoName, team.RepoName)
+
+			for _, player := range team.Players {
+				err = github.ChangeCollaboratorReadOnly(team.RepoName, player.GithubName)
 				if err != nil {
 					log.Default().Println(err)
 					return

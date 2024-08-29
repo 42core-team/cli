@@ -10,7 +10,11 @@ import (
 func runMain() int {
 	form := huh.NewForm(
 		huh.NewGroup(
-			huh.NewSelect[string]().Options(huh.NewOption("Team List", "teamlist"), huh.NewOption("Create Repos", "createrepos")).Title("Main Menu").Description("Choose an option").Key("main"),
+			huh.NewSelect[string]().Options(
+				huh.NewOption("Team List", "teamlist"),
+				huh.NewOption("Create Repos", "createrepos"),
+				huh.NewOption("Rm write Access", "rmwriteaccess"),
+			).Title("Main Menu").Description("Choose an option").Key("main"),
 		),
 	)
 
@@ -28,6 +32,9 @@ func runMain() int {
 		return Nothing
 	case "createrepos":
 		runCreateRepos()
+		return runMain()
+	case "rmwriteaccess":
+		runRemoveWriteAccess()
 		return runMain()
 	default:
 		return Nothing

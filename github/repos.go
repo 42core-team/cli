@@ -3,6 +3,7 @@ package github
 import (
 	"context"
 	"errors"
+	"log"
 	"net/url"
 	"strings"
 
@@ -61,4 +62,29 @@ func AddCollaborator(repoName, userName string) error {
 		Permission: "push",
 	})
 	return err
+}
+
+func ChangeCollaboratorReadOnly(repoName, userName string) error {
+	_, _, err := client.Repositories.AddCollaborator(getGithubContext(), orgName, repoName, userName, &github.RepositoryAddCollaboratorOptions{
+		Permission: "pull",
+	})
+	return err
+}
+
+func ChangeCollaboratorInviteReadOnly(repoName, userName string) error {
+	invites, _, err := client.Repositories.ListInvitations(getGithubContext(), orgName, userName, nil)
+	if err != nil {
+		return err
+	}
+
+	for _, invite := range invites {
+		if invite.GetPermissions() != "pull" {
+			_, _, err := client.Repositories.UpdateInvitation(getGithubContext(), orgName, repoName, invite.GetID(), "read")
+			if err != nil {
+				log.Default().Println(err)
+			}
+		}
+	}
+
+	return nil
 }
