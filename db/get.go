@@ -54,6 +54,6 @@ func GetPLayersByTeamName(name string) []model.Player {
 
 func GetTeams() []model.Team {
 	var teams []model.Team
-	db.Find(&teams)
+	db.Model(&model.Team{}).Preload("Players").Find(&teams)
 	return teams
 }
