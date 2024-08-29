@@ -24,6 +24,8 @@ Loop:
 		switch teamID {
 		case UserAborted:
 			break Loop
+		case GoBack:
+			break Loop
 		case NewEntry:
 			runTAddForm()
 		default:

@@ -18,6 +18,7 @@ func runTList() int {
 				Value(&teamID).
 				OptionsFunc(func() []huh.Option[int] {
 					var options []huh.Option[int]
+					options = append(options, huh.NewOption[int]("<Back>", GoBack))
 					options = append(options, huh.NewOption[int]("<New>", NewEntry))
 
 					for _, team := range db.GetTeams() {

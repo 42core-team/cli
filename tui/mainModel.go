@@ -27,7 +27,8 @@ func runMain() int {
 		handleTList()
 		return Nothing
 	case "createrepos":
-		return runCreateRepos()
+		runCreateRepos()
+		return runMain()
 	default:
 		return Nothing
 	}
