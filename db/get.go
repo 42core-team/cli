@@ -22,7 +22,7 @@ func GetPlayerByGithubName(githubName string) *model.Player {
 
 func GetTeam(id uint) *model.Team {
 	var team model.Team
-	db.First(&team, id)
+	db.Model(&model.Team{}).Preload("Players").First(&team, id)
 	return &team
 }
 

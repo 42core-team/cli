@@ -1,7 +1,8 @@
 package tui
 
 const (
-	Nothing     = -5
+	Nothing     = -6
+	Reset       = -5
 	UserAborted = -4
 	GoBack      = -3
 	Success     = -2
@@ -50,6 +51,8 @@ Loop:
 			case Success:
 				break Loop
 			}
+		case Reset:
+			runTRepoReset(teamID)
 		default:
 			runPDetailsForm(playerID)
 		}

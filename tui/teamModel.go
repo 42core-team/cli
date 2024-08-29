@@ -2,9 +2,11 @@ package tui
 
 import (
 	"core-cli/db"
+	"core-cli/github"
 	"core-cli/model"
 	"errors"
 	"log"
+	"os"
 
 	"github.com/charmbracelet/huh"
 )
@@ -94,6 +96,7 @@ func runTDetails(teamID int) int {
 					options = append(options, huh.NewOption[int]("<Back>", GoBack))
 					options = append(options, huh.NewOption[int]("<New>", NewEntry))
 					options = append(options, huh.NewOption[int]("<Delete>", DeleteEntry))
+					options = append(options, huh.NewOption[int]("<Reset Repo>", Reset))
 
 					for _, player := range db.GetPlayersByTeamID(uint(teamID)) {
 						options = append(options, huh.NewOption(player.IntraName+" - "+player.GithubName, int(player.ID)))
@@ -140,6 +143,67 @@ func runTDelete(teamID int) int {
 		})
 		return Success
 	}
+
+	return Nothing
+}
+
+func runTRepoReset(teamID int) int {
+	team := db.GetTeam(uint(teamID))
+
+	defaultRepo := os.Getenv("DEFAULT_TEMPLATE_REPO")
+	form := huh.NewForm(
+		huh.NewGroup(
+			huh.NewInput().Title("Reset repo of team "+team.Name).Description("Enter the url of the template repo").Key("url").Value(&defaultRepo).Validate(func(input string) error {
+				if input == "" {
+					return errors.New("url cannot be empty")
+				}
+				_, err := github.GetRepoFromURL(input)
+				if err != nil {
+					return err
+				}
+				return nil
+			}),
+			huh.NewConfirm().Title("Confirm").Description("Do you want to reset the repo?").Key("confirm"),
+		),
+	)
+
+	err := form.Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return UserAborted
+		}
+		log.Default().Fatal(err)
+	}
+
+	if !form.GetBool("confirm") {
+		return GoBack
+	}
+
+	templateRepo, err := github.GetRepoFromURL(form.GetString("url"))
+	if err != nil {
+		log.Default().Fatal(err)
+	}
+
+	ShowLoadingScreen("Resetting Repo...", func() {
+		github.DeleteRepo(team.RepoName)
+
+		repo, err := github.CreateRepoFromTemplate(team.Name, templateRepo)
+		if err != nil {
+			log.Default().Println(err)
+			return
+		}
+
+		team.RepoName = *repo.Name
+		db.SaveTeam(team)
+
+		for _, player := range team.Players {
+			err = github.AddCollaborator(*repo.Name, player.GithubName)
+			if err != nil {
+				log.Default().Println(err)
+				return
+			}
+		}
+	})
 
 	return Nothing
 }
