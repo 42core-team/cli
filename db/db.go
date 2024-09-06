@@ -15,7 +15,7 @@ import (
 var db *gorm.DB
 
 func Connect() {
-	if os.Getenv("GITHUB_USE_DB_REPO") == "true" {
+	if os.Getenv("GITHUB_USE_DB_REPO") == "true" || !folderExists("./cli-db") {
 		pullDatabase()
 	}
 
@@ -72,4 +72,14 @@ func pushDatabase() {
 	if err != nil {
 		log.Default().Fatal(err)
 	}
+}
+
+// Check if a folder exists
+func folderExists(folderPath string) bool {
+	if _, err := os.Stat(folderPath); os.IsNotExist(err) {
+		// Folder does not exist
+		return false
+	}
+	// Folder exists
+	return true
 }
