@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/strslice"
 )
 
 func RunImage(image string) (*string, error) {
@@ -24,6 +25,26 @@ func CreateContainer(image string) (container.CreateResponse, error) {
 	resp, err := cli.ContainerCreate(context.Background(), &container.Config{
 		Image: image,
 	}, nil, nil, nil, "")
+	return resp, err
+}
+
+func CreateServerContainer(name, image, networkID string, entrypoint strslice.StrSlice) (container.CreateResponse, error) {
+	resp, err := cli.ContainerCreate(context.Background(), &container.Config{
+		Image:      image,
+		Entrypoint: entrypoint,
+	}, &container.HostConfig{
+		NetworkMode: container.NetworkMode(networkID),
+	}, nil, nil, name)
+	return resp, err
+}
+
+func CreateBotContainer(name, image, networkID string, env []string) (container.CreateResponse, error) {
+	resp, err := cli.ContainerCreate(context.Background(), &container.Config{
+		Image: image,
+		Env:   env,
+	}, &container.HostConfig{
+		NetworkMode: container.NetworkMode(networkID),
+	}, nil, nil, name)
 	return resp, err
 }
 
