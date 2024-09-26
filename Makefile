@@ -1,10 +1,5 @@
-VPATH	:=	cli \
-			services
-
-SRCS := $(foreach dir, $(VPATH), $(wildcard $(dir)/*.go))
-
 all:
-	go run $(SRCS)
+	go run main.go
 
 build:
-	go build -o core-cli $(SRCS)
+	go build -o core-cli main.go
