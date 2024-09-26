@@ -7,6 +7,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/charmbracelet/huh"
 )
@@ -54,6 +55,9 @@ func runTAddForm() int {
 				Validate(func(input string) error {
 					if input == "" {
 						return errors.New("team name cannot be empty")
+					}
+					if strings.ContainsAny(input, " ") {
+						return errors.New("team name cannot contain spaces")
 					}
 					if db.TeamExistsByName(input) {
 						return errors.New(input + " already exists in the db")
