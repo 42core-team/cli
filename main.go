@@ -16,7 +16,6 @@ func main() {
 		godotenv.Load()
 		logging.SetupLogToFile()
 	})
-
 	defer logging.CloseLogToFile()
 
 	tui.ShowLoadingScreen("Init Github client...", func() {

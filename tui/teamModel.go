@@ -92,10 +92,19 @@ func runTDetails(teamID int) int {
 				Title("Team Details").
 				Description("Choose an option").
 				OptionsFunc(func() []huh.Option[int] {
+					team := db.GetTeam(uint(teamID))
 					var options []huh.Option[int]
+
 					options = append(options, huh.NewOption[int]("<Back>", GoBack))
 					options = append(options, huh.NewOption[int]("<New>", NewEntry))
 					options = append(options, huh.NewOption[int]("<Delete>", DeleteEntry))
+
+					if team.Selected {
+						options = append(options, huh.NewOption[int]("<[X] Deselect>", Select))
+					} else {
+						options = append(options, huh.NewOption[int]("<[ ] Select>", Select))
+					}
+
 					options = append(options, huh.NewOption[int]("<Reset Repo>", Reset))
 
 					for _, player := range db.GetPlayersByTeamID(uint(teamID)) {

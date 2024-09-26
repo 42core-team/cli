@@ -1,7 +1,10 @@
 package tui
 
+import "core-cli/db"
+
 const (
-	Nothing     = -6
+	Nothing     = -7
+	Select      = -6
 	Reset       = -5
 	UserAborted = -4
 	GoBack      = -3
@@ -53,6 +56,9 @@ Loop:
 			}
 		case Reset:
 			runTRepoReset(teamID)
+		case Select:
+			db.ToggleTeamSelection(uint(teamID))
+			continue Loop
 		default:
 			runPDetailsForm(playerID)
 		}

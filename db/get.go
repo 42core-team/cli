@@ -57,3 +57,9 @@ func GetTeams() []model.Team {
 	db.Model(&model.Team{}).Preload("Players").Find(&teams)
 	return teams
 }
+
+func GetSelectedTeams() []model.Team {
+	var teams []model.Team
+	db.Model(&model.Team{}).Preload("Players").Where("selected = ?", true).Find(&teams)
+	return teams
+}

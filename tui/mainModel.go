@@ -14,6 +14,7 @@ func runMain() int {
 				huh.NewOption("Team List", "teamlist"),
 				huh.NewOption("Create Repos", "createrepos"),
 				huh.NewOption("Rm write Access", "rmwriteaccess"),
+				huh.NewOption("Run selected game", "runselectedgame"),
 			).Title("Main Menu").Description("Choose an option").Key("main"),
 		),
 	)
@@ -35,6 +36,9 @@ func runMain() int {
 		return runMain()
 	case "rmwriteaccess":
 		runRemoveWriteAccess()
+		return runMain()
+	case "runselectedgame":
+		runSelectedGame()
 		return runMain()
 	default:
 		return Nothing

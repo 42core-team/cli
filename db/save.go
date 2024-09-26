@@ -9,3 +9,9 @@ func SavePlayer(player *model.Player) {
 func SaveTeam(team *model.Team) {
 	db.Save(team)
 }
+
+func ToggleTeamSelection(teamID uint) {
+	team := GetTeam(teamID)
+	team.Selected = !team.Selected
+	db.Save(team)
+}
