@@ -62,4 +62,6 @@ func RunGame(team1, team2 model.Team) error {
 	if err != nil {
 		return err
 	}
+
+	return nil
 }
