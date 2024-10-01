@@ -63,3 +63,15 @@ func GetSelectedTeams() []model.Team {
 	db.Model(&model.Team{}).Preload("Players").Where("selected = ?", true).Find(&teams)
 	return teams
 }
+
+func GetContainers() []model.Container {
+	var containers []model.Container
+	db.Find(&containers)
+	return containers
+}
+
+func GetNetworks() []model.Network {
+	var networks []model.Network
+	db.Find(&networks)
+	return networks
+}

@@ -34,7 +34,7 @@ func Connect() {
 		log.Default().Fatal(err)
 	}
 
-	db.AutoMigrate(model.Player{}, model.Team{})
+	db.AutoMigrate(model.Player{}, model.Team{}, model.Container{}, model.Network{})
 
 	if os.Getenv("GITHUB_USE_DB_REPO") == "true" {
 		pushDatabase()

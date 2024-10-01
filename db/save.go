@@ -15,3 +15,11 @@ func ToggleTeamSelection(teamID uint) {
 	team.Selected = !team.Selected
 	db.Save(team)
 }
+
+func AddContainer(containerID, gameName string) {
+	db.Save(&model.Container{ContainerID: containerID, GameName: gameName})
+}
+
+func AddNetwork(networkID, gameName string) {
+	db.Save(&model.Network{NetworkID: networkID, GameName: gameName})
+}
