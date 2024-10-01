@@ -1,24 +1,20 @@
 package game
 
 import (
+	"core-cli/db"
 	"core-cli/docker"
 	"core-cli/model"
 	"os"
 )
 
 func RunGame(team1, team2 model.Team) error {
-	err := docker.PullImage(os.Getenv("SERVER_IMAGE"))
-	if err != nil {
-		return err
-	}
-	err = docker.PullImage(os.Getenv("BOT_CLIENT_IMAGE"))
-	if err != nil {
-		return err
-	}
+	docker.PullImage(os.Getenv("SERVER_IMAGE"))
+	docker.PullImage(os.Getenv("BOT_CLIENT_IMAGE"))
 
 	name := "game-" + team1.Name + "-" + team2.Name
 
 	networkID := docker.CreateNetwork(name)
+	db.AddNetwork(networkID, name)
 
 	resp, err := docker.CreateServerContainer("server-"+name, os.Getenv("SERVER_IMAGE"), networkID, []string{
 		"./game", "1", "2",
@@ -27,6 +23,7 @@ func RunGame(team1, team2 model.Team) error {
 		return err
 	}
 	serverID := resp.ID
+	db.AddContainer(serverID, name)
 
 	resp, err = docker.CreateBotContainer("bot1-"+name, os.Getenv("BOT_CLIENT_IMAGE"), networkID, []string{
 		"SERVER_IP=server-" + name,
@@ -38,6 +35,7 @@ func RunGame(team1, team2 model.Team) error {
 		return err
 	}
 	bot1ID := resp.ID
+	db.AddContainer(bot1ID, name)
 
 	resp, err = docker.CreateBotContainer("bot2-"+name, os.Getenv("BOT_CLIENT_IMAGE"), networkID, []string{
 		"SERVER_IP=server-" + name,
@@ -49,6 +47,7 @@ func RunGame(team1, team2 model.Team) error {
 		return err
 	}
 	bot2ID := resp.ID
+	db.AddContainer(bot2ID, name)
 
 	err = docker.StartContainer(serverID)
 	if err != nil {

@@ -2,6 +2,7 @@ package tui
 
 import (
 	"core-cli/db"
+	"core-cli/docker"
 	"core-cli/game"
 	"log"
 
@@ -33,6 +34,10 @@ func runSelectedGame() int {
 		if err != nil {
 			log.Default().Println(err)
 		}
+	}).Run()
+
+	spinner.New().Title("Cleaning up...").Action(func() {
+		docker.CleanUP()
 	}).Run()
 
 	return Nothing
