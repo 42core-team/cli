@@ -15,6 +15,7 @@ func runMain() int {
 				huh.NewOption("Create Repos", "createrepos"),
 				huh.NewOption("Rm write Access", "rmwriteaccess"),
 				huh.NewOption("Run selected game", "runselectedgame"),
+				huh.NewOption("Cleanup Docker", "cleanupdocker"),
 			).Title("Main Menu").Description("Choose an option").Key("main"),
 		),
 	)
@@ -39,6 +40,9 @@ func runMain() int {
 		return runMain()
 	case "runselectedgame":
 		runSelectedGame()
+		return runMain()
+	case "cleanupdocker":
+		runCleanupDocker()
 		return runMain()
 	default:
 		return Nothing

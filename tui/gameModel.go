@@ -13,17 +13,24 @@ import (
 func runSelectedGame() int {
 	teams := db.GetSelectedTeams()
 
+	msgTitle := ""
+	msgDesc := ""
+
 	if len(teams) == 0 {
-		huh.NewForm(
-			huh.NewGroup(
-				huh.NewNote().Title("No teams selected").Description("Please go to the team list and select two teams"),
-			),
-		).Run()
-		return Nothing
+		msgTitle = "No teams selected"
+		msgDesc = "Please go to the team list and select two teams"
 	} else if len(teams) != 2 {
+		msgTitle = "Select two teams"
+		msgDesc = "Please go to the team list and select two teams"
+	} else if teams[0].RepoName == "" || teams[1].RepoName == "" {
+		msgTitle = "No repo found"
+		msgDesc = "Please go to the team list and create repos for the selected teams"
+	}
+
+	if msgTitle != "" {
 		huh.NewForm(
 			huh.NewGroup(
-				huh.NewNote().Title("Select two teams").Description("Please go to the team list and select two teams"),
+				huh.NewNote().Title(msgTitle).Description(msgDesc),
 			),
 		).Run()
 		return Nothing
@@ -36,6 +43,10 @@ func runSelectedGame() int {
 		}
 	}).Run()
 
+	return Nothing
+}
+
+func runCleanupDocker() int {
 	spinner.New().Title("Cleaning up...").Action(func() {
 		docker.CleanUP()
 	}).Run()

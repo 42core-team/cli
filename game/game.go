@@ -27,7 +27,7 @@ func RunGame(team1, team2 model.Team) error {
 
 	resp, err = docker.CreateBotContainer("bot1-"+name, os.Getenv("BOT_CLIENT_IMAGE"), networkID, []string{
 		"SERVER_IP=server-" + name,
-		"REPO_URL=" + team1.RepoName,
+		"REPO_URL=https://github.com/" + os.Getenv("GITHUB_ORG") + "/" + team1.RepoName,
 		"GIT_ACCESS_TOKEN=" + os.Getenv("GITHUB_TOKEN"),
 		"PLAYER_ID=1",
 	})
@@ -39,7 +39,7 @@ func RunGame(team1, team2 model.Team) error {
 
 	resp, err = docker.CreateBotContainer("bot2-"+name, os.Getenv("BOT_CLIENT_IMAGE"), networkID, []string{
 		"SERVER_IP=server-" + name,
-		"REPO_URL=" + team2.RepoName,
+		"REPO_URL=https://github.com/" + os.Getenv("GITHUB_ORG") + "/" + team2.RepoName,
 		"GIT_ACCESS_TOKEN=" + os.Getenv("GITHUB_TOKEN"),
 		"PLAYER_ID=2",
 	})
