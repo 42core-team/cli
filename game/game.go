@@ -49,6 +49,17 @@ func RunGame(team1, team2 model.Team) error {
 	bot2ID := resp.ID
 	db.AddContainer(bot2ID, name)
 
+	resp, err = docker.CreateVisualizerContainer("visualizer-"+name, os.Getenv("VISUALIZER_IMAGE"), networkID, []string{
+		"PORT=4242",
+		"SOCKET_SERVER=server-" + name + ":4242",
+		"HOST=127.0.0.1:4242",
+	}, "4242", "4242")
+	if err != nil {
+		return err
+	}
+	visualizerID := resp.ID
+	db.AddContainer(visualizerID, name)
+
 	err = docker.StartContainer(serverID)
 	if err != nil {
 		return err
@@ -58,6 +69,10 @@ func RunGame(team1, team2 model.Team) error {
 		return err
 	}
 	err = docker.StartContainer(bot2ID)
+	if err != nil {
+		return err
+	}
+	err = docker.StartContainer(visualizerID)
 	if err != nil {
 		return err
 	}

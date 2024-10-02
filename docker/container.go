@@ -5,6 +5,7 @@ import (
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/strslice"
+	"github.com/docker/go-connections/nat"
 )
 
 func RunImage(image string) (*string, error) {
@@ -44,6 +45,27 @@ func CreateBotContainer(name, image, networkID string, env []string) (container.
 		Env:   env,
 	}, &container.HostConfig{
 		NetworkMode: container.NetworkMode(networkID),
+	}, nil, nil, name)
+	return resp, err
+}
+
+func CreateVisualizerContainer(name, image, networkID string, env []string, exposedPort, internalPort string) (container.CreateResponse, error) {
+	containerPort, err := nat.NewPort("tcp", internalPort)
+	if err != nil {
+		return container.CreateResponse{}, err
+	}
+
+	resp, err := cli.ContainerCreate(context.Background(), &container.Config{
+		Image: image,
+		Env:   env,
+	}, &container.HostConfig{
+		NetworkMode: container.NetworkMode(networkID),
+		PortBindings: nat.PortMap{
+			containerPort: []nat.PortBinding{{
+				HostIP:   "0.0.0.0",
+				HostPort: exposedPort,
+			}},
+		},
 	}, nil, nil, name)
 	return resp, err
 }
