@@ -50,10 +50,10 @@ func RunGame(team1, team2 model.Team) error {
 	db.AddContainer(bot2ID, name)
 
 	resp, err = docker.CreateVisualizerContainer("visualizer-"+name, os.Getenv("VISUALIZER_IMAGE"), networkID, []string{
-		"PORT=4242",
+		"PORT=80",
 		"SOCKET_SERVER=server-" + name + ":4242",
-		"HOST=127.0.0.1:4242",
-	}, "4242", "4242")
+		"HOST=127.0.0.1:4000",
+	}, "4000", "80")
 	if err != nil {
 		return err
 	}

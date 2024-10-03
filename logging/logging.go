@@ -15,6 +15,7 @@ func SetupLogToFile() {
 	}
 
 	log.Default().SetOutput(logFile)
+	log.Default().SetFlags(log.LstdFlags | log.Lshortfile)
 }
 
 func CloseLogToFile() {
