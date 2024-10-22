@@ -10,6 +10,7 @@ import (
 func RunGame(team1, team2 model.Team) error {
 	docker.PullImage(os.Getenv("SERVER_IMAGE"))
 	docker.PullImage(os.Getenv("BOT_CLIENT_IMAGE"))
+	docker.PullImage(os.Getenv("VISUALIZER_IMAGE"))
 
 	name := "game-" + team1.Name + "-" + team2.Name
 

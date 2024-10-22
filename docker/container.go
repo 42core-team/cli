@@ -58,11 +58,14 @@ func CreateVisualizerContainer(name, image, networkID string, env []string, expo
 	resp, err := cli.ContainerCreate(context.Background(), &container.Config{
 		Image: image,
 		Env:   env,
+		ExposedPorts: nat.PortSet{
+			containerPort: struct{}{},
+		},
 	}, &container.HostConfig{
 		NetworkMode: container.NetworkMode(networkID),
 		PortBindings: nat.PortMap{
 			containerPort: []nat.PortBinding{{
-				HostIP:   "0.0.0.0",
+				HostIP:   "",
 				HostPort: exposedPort,
 			}},
 		},
