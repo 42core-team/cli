@@ -46,6 +46,17 @@ func runSelectedGame() int {
 	return Nothing
 }
 
+func runAgainstStarlord(teamID uint) int {
+	spinner.New().Title("Running game...").Action(func() {
+		err := game.RunGameAgainstStarlord(db.GetTeam(teamID))
+		if err != nil {
+			log.Default().Println(err)
+		}
+	}).Run()
+
+	return Nothing
+}
+
 func runCleanupDocker() int {
 	spinner.New().Title("Cleaning up...").Action(func() {
 		docker.CleanUP()

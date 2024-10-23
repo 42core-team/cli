@@ -3,14 +3,15 @@ package tui
 import "core-cli/db"
 
 const (
-	Nothing     = -7
-	Select      = -6
-	Reset       = -5
-	UserAborted = -4
-	GoBack      = -3
-	Success     = -2
-	DeleteEntry = -1
-	NewEntry    = 0
+	RunAgainstStarlord = -8
+	Nothing            = -7
+	Select             = -6
+	Reset              = -5
+	UserAborted        = -4
+	GoBack             = -3
+	Success            = -2
+	DeleteEntry        = -1
+	NewEntry           = 0
 )
 
 func Start() {
@@ -59,6 +60,8 @@ Loop:
 		case Select:
 			db.ToggleTeamSelection(uint(teamID))
 			continue Loop
+		case RunAgainstStarlord:
+			runAgainstStarlord(uint(teamID))
 		default:
 			runPDetailsForm(playerID)
 		}

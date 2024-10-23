@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func runGameAgainstStarlord(team *model.Team) error {
+func RunGameAgainstStarlord(team *model.Team) error {
 	docker.PullImage(os.Getenv("SERVER_IMAGE"))
 	docker.PullImage(os.Getenv("BOT_CLIENT_IMAGE"))
 
@@ -37,7 +37,7 @@ func runGameAgainstStarlord(team *model.Team) error {
 	bot1ID := resp.ID
 	db.AddContainer(bot1ID, name)
 
-	resp, err = docker.CreateBotContainer("bot2-"+name, os.Getenv("BOT_CLIENT_IMAGE"), networkID, []string{
+	resp, err = docker.CreateBotContainer("starlord-"+name, os.Getenv("BOT_CLIENT_IMAGE"), networkID, []string{
 		"SERVER_IP=server-" + name,
 		"REPO_URL=" + os.Getenv("STARLORD_REPO"),
 		"GIT_ACCESS_TOKEN=" + os.Getenv("GITHUB_TOKEN"),

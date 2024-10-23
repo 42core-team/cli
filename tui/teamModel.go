@@ -110,6 +110,7 @@ func runTDetails(teamID int) int {
 					}
 
 					options = append(options, huh.NewOption[int]("<Reset Repo>", Reset))
+					options = append(options, huh.NewOption[int]("<Run against Starlord>", RunAgainstStarlord))
 
 					for _, player := range db.GetPlayersByTeamID(uint(teamID)) {
 						options = append(options, huh.NewOption(player.IntraName+" - "+player.GithubName, int(player.ID)))
