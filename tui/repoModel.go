@@ -50,9 +50,8 @@ func runCreateRepos() int {
 
 	for ind, team := range teams {
 		ShowLoadingScreen("Creating repos ("+strconv.Itoa(ind+1)+"/"+strconv.Itoa(len(teams))+")", func() {
-			repo, err := github.GetRepoFromName(team.Name)
 			if err != nil {
-				repo, err = github.CreateRepoFromTemplate(team.Name, templateRepo)
+				repo, err := github.CreateRepoFromTemplate(team.Name, templateRepo)
 				if err != nil {
 					log.Default().Println(err)
 					return
@@ -60,12 +59,42 @@ func runCreateRepos() int {
 				team.RepoName = *repo.Name
 				db.SaveTeam(&team)
 			}
+		})
+	}
 
+	return Nothing
+}
+
+func runSendInvites() int {
+	form := huh.NewForm(
+		huh.NewGroup(
+			huh.NewConfirm().Title("Send Invites").Description("Do you want to invite everyone?").Key("confirm"),
+		),
+	)
+
+	err := form.Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return UserAborted
+		}
+		log.Default().Fatal(err)
+	}
+
+	if !form.GetBool("confirm") {
+		return GoBack
+	}
+
+	teams := db.GetTeams()
+	for ind, team := range teams {
+		ShowLoadingScreen("Sending Invites ("+strconv.Itoa(ind+1)+"/"+strconv.Itoa(len(teams))+")", func() {
 			for _, player := range team.Players {
-				err = github.AddCollaborator(*repo.Name, player.GithubName)
+				if team.RepoName == "" {
+					continue
+				}
+
+				err = github.AddCollaborator(team.RepoName, player.GithubName)
 				if err != nil {
 					log.Default().Println(err)
-					return
 				}
 			}
 		})
