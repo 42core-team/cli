@@ -8,8 +8,8 @@ import (
 )
 
 func RunGameAgainstStarlord(team *model.Team) error {
-	docker.PullImage(os.Getenv("SERVER_IMAGE"))
-	docker.PullImage(os.Getenv("BOT_CLIENT_IMAGE"))
+	// docker.PullImage(os.Getenv("SERVER_IMAGE"))
+	// docker.PullImage(os.Getenv("BOT_CLIENT_IMAGE"))
 
 	name := "game-starlord-" + team.Name
 

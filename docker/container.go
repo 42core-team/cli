@@ -84,3 +84,11 @@ func StopContainer(id string) error {
 func RemoveContainer(id string) error {
 	return cli.ContainerRemove(context.Background(), id, container.RemoveOptions{})
 }
+
+func CheckContainerStatus(id string) (string, error) {
+	info, err := cli.ContainerInspect(context.Background(), id)
+	if err != nil {
+		return "", err
+	}
+	return info.State.Status, nil
+}
