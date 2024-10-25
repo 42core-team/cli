@@ -12,6 +12,8 @@ func GetLogs(id string) (string, error) {
 	out, err := cli.ContainerLogs(context.Background(), id, container.LogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
+		Timestamps: false,
+		Details:    false,
 	})
 	if err != nil {
 		return "", err

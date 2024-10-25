@@ -2,9 +2,12 @@ package github
 
 import (
 	"context"
+	"core-cli/utils"
 	"errors"
+	"fmt"
 	"log"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/google/go-github/v62/github"
@@ -97,4 +100,59 @@ func ChangeCollaboratorInviteReadOnly(repoName, userName string) error {
 	}
 
 	return nil
+}
+
+func CreateTraceRelease(repoName, body string, draft, prerelease bool) (*github.RepositoryRelease, error) {
+	ctx := context.Background()
+
+	// Function to check if a tag exists
+	tagExists := func(tag string) (bool, error) {
+		_, _, err := client.Repositories.GetReleaseByTag(ctx, orgName, repoName, tag)
+		if err != nil {
+			if _, ok := err.(*github.ErrorResponse); ok && err.(*github.ErrorResponse).Response.StatusCode == 404 {
+				return false, nil
+			}
+			return false, err
+		}
+		return true, nil
+	}
+
+	// Increment tag if it already exists
+	tagName := "trace00"
+	for {
+		exists, err := tagExists(tagName)
+		if err != nil {
+			return nil, err
+		}
+		if !exists {
+			break
+		}
+		tagName = incrementTraceTag(tagName)
+	}
+
+	body = utils.TrimStringWithIndicator(body, 125000, "....[Log Truncated]....")
+
+	release := &github.RepositoryRelease{
+		TagName:    github.String(tagName),
+		Name:       github.String(tagName),
+		Body:       github.String(body),
+		Draft:      github.Bool(draft),
+		Prerelease: github.Bool(prerelease),
+	}
+
+	repoRelease, _, err := client.Repositories.CreateRelease(ctx, orgName, repoName, release)
+	if err != nil {
+		return nil, err
+	}
+
+	return repoRelease, nil
+}
+
+func incrementTraceTag(tag string) string {
+	numStr := tag[5:]
+	num, err := strconv.Atoi(numStr)
+	if err == nil {
+		return fmt.Sprintf("trace%02d", num+1)
+	}
+	return "trace00"
 }

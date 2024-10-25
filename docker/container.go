@@ -3,6 +3,7 @@ package docker
 import (
 	"context"
 
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/go-connections/nat"
@@ -85,10 +86,10 @@ func RemoveContainer(id string) error {
 	return cli.ContainerRemove(context.Background(), id, container.RemoveOptions{})
 }
 
-func CheckContainerStatus(id string) (string, error) {
+func CheckContainerStatus(id string) (*types.ContainerState, error) {
 	info, err := cli.ContainerInspect(context.Background(), id)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return info.State.Status, nil
+	return info.State, nil
 }

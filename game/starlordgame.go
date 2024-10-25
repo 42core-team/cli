@@ -3,8 +3,11 @@ package game
 import (
 	"core-cli/db"
 	"core-cli/docker"
+	"core-cli/github"
 	"core-cli/model"
+	"log"
 	"os"
+	"time"
 )
 
 func RunGameAgainstStarlord(team *model.Team) error {
@@ -61,6 +64,37 @@ func RunGameAgainstStarlord(team *model.Team) error {
 	if err != nil {
 		return err
 	}
+
+	go func() {
+		for {
+			status, err := docker.CheckContainerStatus(bot1ID)
+			if err != nil {
+				log.Default().Println(err)
+				return
+			}
+			if !status.Running {
+				break
+			}
+			time.Sleep(500 * time.Millisecond)
+		}
+
+		logs, err := docker.GetLogs(bot1ID)
+		if err != nil {
+			log.Default().Println(err)
+			return
+		}
+
+		_, err = github.CreateTraceRelease(team.RepoName, "```\n"+logs+"\n```", false, false)
+		if err != nil {
+			log.Default().Println(err)
+			return
+		}
+
+		docker.StopRmContainer(serverID)
+		docker.StopRmContainer(bot1ID)
+		docker.StopRmContainer(bot2ID)
+		docker.RemoveNetwork(networkID)
+	}()
 
 	return nil
 }
