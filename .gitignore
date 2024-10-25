@@ -4,3 +4,4 @@ application.log
 db.log
 test/
 .idea/
+.DS_Store

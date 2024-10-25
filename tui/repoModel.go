@@ -50,15 +50,13 @@ func runCreateRepos() int {
 
 	for ind, team := range teams {
 		ShowLoadingScreen("Creating repos ("+strconv.Itoa(ind+1)+"/"+strconv.Itoa(len(teams))+")", func() {
+			repo, err := github.CreateRepoFromTemplate(team.Name, templateRepo)
 			if err != nil {
-				repo, err := github.CreateRepoFromTemplate(team.Name, templateRepo)
-				if err != nil {
-					log.Default().Println(err)
-					return
-				}
-				team.RepoName = *repo.Name
-				db.SaveTeam(&team)
+				log.Default().Println(err)
+				return
 			}
+			team.RepoName = *repo.Name
+			db.SaveTeam(&team)
 		})
 	}
 
