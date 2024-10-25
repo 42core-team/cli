@@ -64,3 +64,16 @@ func runCleanupDocker() int {
 
 	return Nothing
 }
+
+func runTraces() int {
+	spinner.New().Title("Starting games...").Action(func() {
+		for _, team := range db.GetTeams() {
+			err := game.RunGameAgainstStarlord(&team)
+			if err != nil {
+				log.Default().Println(err)
+			}
+		}
+	}).Run()
+
+	return Nothing
+}
