@@ -1,5 +1,6 @@
 .env
 cli-db
 application.log
+db.log
 test/
 .idea/

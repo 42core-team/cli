@@ -3,6 +3,7 @@ package tui
 import "core-cli/db"
 
 const (
+	Clear              = -9
 	RunAgainstStarlord = -8
 	Nothing            = -7
 	Select             = -6
@@ -33,6 +34,8 @@ Loop:
 			break Loop
 		case NewEntry:
 			runTAddForm()
+		case Clear:
+			runTClearSelection()
 		default:
 			handleTDetails(teamID)
 		}

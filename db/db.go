@@ -19,10 +19,19 @@ func Connect() {
 		pullDatabase()
 	}
 
-	var err error
+	// Create a new log file for database logs
+	dbLogFile, err := os.OpenFile("./db.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		log.Default().Fatal(err)
+	}
+	defer dbLogFile.Close()
+
+	// Create a custom logger that writes to the log file
+	dbLogger := log.New(dbLogFile, "", log.LstdFlags)
+
 	db, err = gorm.Open(sqlite.Open("./cli-db/coreEvent.db"), &gorm.Config{
 		Logger: logger.New(
-			log.Default(),
+			dbLogger,
 			logger.Config{
 				SlowThreshold: 0,
 				LogLevel:      logger.Info,
@@ -34,7 +43,7 @@ func Connect() {
 		log.Default().Fatal(err)
 	}
 
-	db.AutoMigrate(model.Player{}, model.Team{}, model.Container{}, model.Network{})
+	db.AutoMigrate(model.Player{}, model.Team{}, model.Container{}, model.Network{}, model.Game{})
 
 	if os.Getenv("GITHUB_USE_DB_REPO") == "true" {
 		pushDatabase()

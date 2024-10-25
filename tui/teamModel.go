@@ -23,6 +23,7 @@ func runTList() int {
 					var options []huh.Option[int]
 					options = append(options, huh.NewOption[int]("<Back>", GoBack))
 					options = append(options, huh.NewOption[int]("<New>", NewEntry))
+					options = append(options, huh.NewOption[int]("<Clear Selection>", Clear))
 
 					for _, team := range db.GetTeams() {
 						options = append(options, huh.NewOption(team.Name, int(team.ID)))
@@ -80,6 +81,14 @@ func runTAddForm() int {
 			Name:     form.GetString("name"),
 			RepoName: form.GetString("repoName"),
 		})
+	})
+
+	return Nothing
+}
+
+func runTClearSelection() int {
+	ShowLoadingScreen("Clearing selection", func() {
+		db.ClearTeamSelections()
 	})
 
 	return Nothing

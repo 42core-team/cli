@@ -23,3 +23,7 @@ func AddContainer(containerID, gameName string) {
 func AddNetwork(networkID, gameName string) {
 	db.Save(&model.Network{NetworkID: networkID, GameName: gameName})
 }
+
+func AddGame(game *model.Game) {
+	db.Save(game)
+}

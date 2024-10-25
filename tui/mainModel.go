@@ -16,6 +16,7 @@ func runMain() int {
 				huh.NewOption("Send Invites", "sendinvites"),
 				huh.NewOption("Rm write Access", "rmwriteaccess"),
 				huh.NewOption("Run selected game", "runselectedgame"),
+				huh.NewOption("Run selected game with visualizer", "runselectedgamevisualizer"),
 				huh.NewOption("Run traces for every game", "runtraces"),
 				huh.NewOption("Cleanup Docker", "cleanupdocker"),
 			).Title("Main Menu").Description("Choose an option").Key("main"),
@@ -45,6 +46,9 @@ func runMain() int {
 		return runMain()
 	case "runselectedgame":
 		runSelectedGame()
+		return runMain()
+	case "runselectedgamevisualizer":
+		RunSelectedGameVisualizer()
 		return runMain()
 	case "cleanupdocker":
 		runCleanupDocker()
