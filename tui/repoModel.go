@@ -50,7 +50,8 @@ func runCreateRepos() int {
 
 	for ind, team := range teams {
 		ShowLoadingScreen("Creating repos ("+strconv.Itoa(ind+1)+"/"+strconv.Itoa(len(teams))+")", func() {
-			repo, err := github.CreateRepoFromTemplate(team.Name, templateRepo)
+			name := os.Getenv("EVENT_NAME") + "-" + team.Name
+			repo, err := github.CreateRepoFromTemplate(name, templateRepo)
 			if err != nil {
 				log.Default().Println(err)
 				return
