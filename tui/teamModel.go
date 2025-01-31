@@ -102,7 +102,10 @@ func runTDetails(teamID int) int {
 			huh.NewSelect[int]().
 				Value(&playerID).
 				Key("teamDetails").
-				Title("Team Details").
+				TitleFunc(func() string {
+					team := db.GetTeam(uint(teamID))
+					return "Team " + team.Name
+				}, &teamID).
 				Description("Choose an option").
 				OptionsFunc(func() []huh.Option[int] {
 					team := db.GetTeam(uint(teamID))

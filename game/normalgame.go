@@ -7,6 +7,7 @@ import (
 	"core-cli/utils"
 	"log"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -131,6 +132,12 @@ func RunGame(team1, team2 model.Team) error {
 			return
 		}
 
+		status := "Success"
+
+		if strings.Contains(logs, "Game over, time limit reached") {
+			status = "Time limit reached"
+		}
+
 		if winner == 1 {
 			log.Default().Println("Winner is", team1.Name, " in game ", name)
 			db.AddGame(&model.Game{
@@ -140,7 +147,7 @@ func RunGame(team1, team2 model.Team) error {
 				Team2Name:  team2.Name,
 				Winner:     team1.ID,
 				WinnerName: team1.Name,
-				Status:     "Success",
+				Status:     status,
 			})
 		} else if winner == 2 {
 			log.Default().Println("Winner is", team2.Name, " in game ", name)
@@ -151,7 +158,7 @@ func RunGame(team1, team2 model.Team) error {
 				Team2Name:  team2.Name,
 				Winner:     team2.ID,
 				WinnerName: team2.Name,
-				Status:     "Success",
+				Status:     status,
 			})
 		}
 
