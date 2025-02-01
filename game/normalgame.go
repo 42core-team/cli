@@ -25,6 +25,7 @@ func RunGame(team1, team2 model.Team) error {
 		"./game", "1", "2",
 	}, []string{
 		"SEED=" + os.Getenv("SEED"),
+		"TICK_RATE=" + os.Getenv("TICK_RATE"),
 	})
 	if err != nil {
 		return err
