@@ -23,6 +23,8 @@ func RunGame(team1, team2 model.Team) error {
 
 	resp, err := docker.CreateServerContainer("server-"+name, os.Getenv("SERVER_IMAGE"), networkID, []string{
 		"./game", "1", "2",
+	}, []string{
+		"SEED=" + os.Getenv("SEED"),
 	})
 	if err != nil {
 		return err

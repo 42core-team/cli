@@ -21,7 +21,7 @@ func RunGameAgainstStarlord(team *model.Team) error {
 
 	resp, err := docker.CreateServerContainer("server-"+name, os.Getenv("SERVER_IMAGE"), networkID, []string{
 		"./game", "1", "2",
-	})
+	}, []string{})
 	if err != nil {
 		return err
 	}

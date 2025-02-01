@@ -30,10 +30,11 @@ func CreateContainer(image string) (container.CreateResponse, error) {
 	return resp, err
 }
 
-func CreateServerContainer(name, image, networkID string, entrypoint strslice.StrSlice) (container.CreateResponse, error) {
+func CreateServerContainer(name, image, networkID string, entrypoint strslice.StrSlice, env []string) (container.CreateResponse, error) {
 	resp, err := cli.ContainerCreate(context.Background(), &container.Config{
 		Image:      image,
 		Entrypoint: entrypoint,
+		Env:        env,
 	}, &container.HostConfig{
 		NetworkMode: container.NetworkMode(networkID),
 	}, nil, nil, name)
