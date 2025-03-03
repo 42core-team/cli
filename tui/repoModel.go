@@ -139,3 +139,40 @@ func runRemoveWriteAccess() int {
 
 	return Nothing
 }
+
+func runDeleteAllRepos() int {
+	form := huh.NewForm(
+		huh.NewGroup(
+			huh.NewConfirm().Title("Delete All Repos").Description("Do you really want to delete all repositories?").Key("confirm"),
+		),
+	)
+
+	err := form.Run()
+	if err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return UserAborted
+		}
+		log.Default().Fatal(err)
+	}
+
+	if !form.GetBool("confirm") {
+		return GoBack
+	}
+
+	teams := db.GetTeams()
+	for ind, team := range teams {
+		ShowLoadingScreen("Deleting repos ("+strconv.Itoa(ind+1)+"/"+strconv.Itoa(len(teams))+")", func() {
+			if team.RepoName != "" {
+				err := github.DeleteRepo(team.RepoName)
+				if err != nil {
+					log.Default().Println(err)
+					return
+				}
+				team.RepoName = ""
+				db.SaveTeam(&team)
+			}
+		})
+	}
+
+	return Nothing
+}

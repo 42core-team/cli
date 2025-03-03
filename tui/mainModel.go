@@ -19,6 +19,7 @@ func runMain() int {
 				huh.NewOption("Run selected game with visualizer", "runselectedgamevisualizer"),
 				huh.NewOption("Run traces for every game", "runtraces"),
 				huh.NewOption("Cleanup Docker", "cleanupdocker"),
+				huh.NewOption("Delete All Repos", "deleteallrepos"),
 			).Title("Main Menu").Description("Choose an option").Key("main"),
 		),
 	)
@@ -55,6 +56,9 @@ func runMain() int {
 		return runMain()
 	case "runtraces":
 		runTraces()
+		return runMain()
+	case "deleteallrepos":
+		runDeleteAllRepos()
 		return runMain()
 	default:
 		return Nothing
